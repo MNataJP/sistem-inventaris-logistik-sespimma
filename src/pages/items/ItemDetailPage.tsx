@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getItemByInventoryCode, getItemHistory } from '@/services/inventoryService';
 import { getMaintenanceHistory, createMaintenanceRecord } from '@/services/maintenanceService';
 import { recordScanLog } from '@/services/scanLogService';
@@ -8,23 +8,23 @@ import { InventoryItem, InventoryHistoryRecord } from '@/types/inventory';
 import { MaintenanceRecord, MaintenanceType } from '@/types/maintenance';
 import { useAuth } from '@/context/AuthContext';
 import {
-  ArrowLeft,
   Wrench,
   Repeat,
   History,
   MapPin,
   X,
   Clock,
-  Building2,
-  User,
-  Calendar,
+  LogOut,
+  QrCode,
+  ShieldCheck,
   CheckCircle2,
-  FileText
+  AlertCircle
 } from 'lucide-react';
 
 export const ItemDetailPage: React.FC = () => {
   const { inventoryCode } = useParams<{ inventoryCode: string }>();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [item, setItem] = useState<InventoryItem | null>(null);
   const [historyList, setHistoryList] = useState<InventoryHistoryRecord[]>([]);
@@ -93,6 +93,15 @@ export const ItemDetailPage: React.FC = () => {
   useEffect(() => {
     fetchItemData();
   }, [inventoryCode, user]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
 
   const handleAddMaintenance = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,324 +187,439 @@ export const ItemDetailPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="card" style={{ textAlign: 'center', padding: '3rem', margin: '1rem auto', maxWidth: '600px' }}>
-        <div style={{ width: '36px', height: '36px', border: '3px solid #e2e8f0', borderTopColor: '#1e3a8a', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
-        <p style={{ color: '#64748b' }}>Memuat informasi barang dari QR Code...</p>
-      </div>
-    );
-  }
-
-  if (error || !item) {
-    return (
-      <div className="card" style={{ textAlign: 'center', padding: '3rem', margin: '1rem auto', maxWidth: '600px' }}>
-        <h2 style={{ color: '#b91c1c', marginBottom: '0.5rem' }}>Barang Tidak Ditemukan</h2>
-        <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>{error}</p>
-        <Link to="/items" className="btn btn-primary">
-          Kembali ke Daftar Barang
-        </Link>
-      </div>
-    );
-  }
-
   const isStaff = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'petugas';
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-      {/* Top Header Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Link to="/items" className="btn btn-secondary btn-sm">
-            <ArrowLeft size={16} />
-            <span>Kembali</span>
-          </Link>
-          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e3a8a', fontFamily: 'monospace' }}>
-            {item.inventoryCode}
-          </span>
-        </div>
-      </div>
-
-      {/* Main Grid Layout (Adaptive 2-column desktop / 1-column mobile) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
-        
-        {/* Left Column: Hero Image, Action Buttons (Pinjam & Maintenance), Core Details */}
-        <div>
-          <div className="card" style={{ marginBottom: '1.25rem', textAlign: 'center' }}>
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }}
-              />
-            ) : (
-              <div style={{ height: '160px', backgroundColor: '#f1f5f9', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', marginBottom: '1rem' }}>
-                Foto barang belum diunggah
-              </div>
-            )}
-
-            <h1 style={{ color: '#0f172a', marginBottom: '0.25rem' }}>{item.name}</h1>
-            <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.875rem' }}>
-              {item.categoryNameSnapshot || 'Kategori Logistik'}
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              <span className={`badge ${item.condition === 'Baik' ? 'badge-success' : 'badge-danger'}`}>
-                Kondisi: {item.condition}
-              </span>
-              <span className={`badge ${item.status === 'Tersedia' ? 'badge-success' : 'badge-warning'}`}>
-                Status: {item.status}
-              </span>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+      {/* Official Sespimma Polri Header (Without Sidebar Navigation) */}
+      <header
+        style={{
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #e2e8f0',
+          padding: '0.75rem 1.25rem',
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)'
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1100px',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem'
+          }}
+        >
+          {/* Institution Branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <img
+              src="/logo.png"
+              alt="Logo Sespimma Polri"
+              style={{ width: '36px', height: '36px', objectFit: 'contain' }}
+            />
+            <div>
+              <h1 style={{ fontSize: '1rem', color: '#0f172a', lineHeight: 1.2, margin: 0 }}>
+                Sistem Inventaris Logistik
+              </h1>
+              <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
+                Sespimma Lemdiklat Polri
+              </p>
             </div>
+          </div>
 
-            {/* Action Buttons: Tombol Pinjam Barang & Tombol Maintenance di bawahnya */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', margin: '0.5rem 0 0.5rem', width: '100%' }}>
-              {item.status === 'Tersedia' ? (
-                <button
-                  onClick={openBorrowModal}
-                  className="btn btn-primary"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 10px rgba(30, 58, 138, 0.2)',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer'
-                  }}
-                  title="Ajukan Peminjaman Barang Logistik Ini"
-                >
-                  <Repeat size={18} />
-                  <span>Pinjam Barang Ini</span>
-                </button>
-              ) : item.status === 'Dipinjam' ? (
+          {/* User Profile Pill & Quick Logout */}
+          {user && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#f1f5f9',
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '20px',
+                  border: '1px solid #e2e8f0'
+                }}
+              >
                 <div
                   style={{
-                    padding: '0.625rem 0.875rem',
-                    backgroundColor: '#eff6ff',
-                    border: '1px solid #bfdbfe',
-                    borderRadius: '8px',
-                    color: '#1e40af',
-                    fontSize: '0.825rem',
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: '#1e3a8a',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontWeight: 600
+                    fontSize: '0.75rem',
+                    fontWeight: 700
                   }}
                 >
-                  <Clock size={16} />
-                  <span>Status: Sedang Dipinjam</span>
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
-              ) : null}
-
-              {/* Tombol Maintenance di bawah tombol pinjam barang */}
-              {isStaff && (
-                <button
-                  onClick={() => setShowMaintenanceModal(true)}
-                  className="btn btn-secondary"
-                  style={{
-                    width: '100%',
-                    padding: '0.65rem 1rem',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    borderRadius: '10px',
-                    backgroundColor: '#f8fafc',
-                    border: '1px solid #cbd5e1',
-                    color: '#334155',
-                    cursor: 'pointer'
-                  }}
-                  title="Catat Pemeliharaan / Perbaikan Barang"
-                >
-                  <Wrench size={16} />
-                  <span>+ Catat Maintenance</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Location & Responsible Person */}
-          <div className="card">
-            <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e3a8a' }}>
-              <MapPin size={18} />
-              <span>Lokasi & Penanggung Jawab</span>
-            </h3>
-
-            <div style={{ fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>GEDUNG / RUANGAN</span>
-                <strong style={{ color: '#0f172a' }}>{item.building || '-'}, Lantai {item.floor || '1'} ({item.room || '-'})</strong>
-              </div>
-
-              <div>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>DETAIL POSISI</span>
-                <span>{item.locationDetail || '-'}</span>
-              </div>
-
-              <div>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>PENANGGUNG JAWAB ASET</span>
-                <strong style={{ color: '#1e3a8a' }}>{item.responsiblePersonNameSnapshot || 'Dinas Logistik Sespimma'}</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Specs, Maintenance & Audit History */}
-        <div>
-          {/* Mobile Tab Selectors (< 768px) */}
-          <div style={{ display: 'flex', borderBottom: '2px solid #e2e8f0', marginBottom: '1rem', gap: '0.5rem' }} className="mobile-detail-tabs">
-            <button
-              onClick={() => setActiveTab('specs')}
-              style={{
-                padding: '0.5rem 0.875rem',
-                border: 'none',
-                background: 'none',
-                fontWeight: activeTab === 'specs' ? 700 : 500,
-                color: activeTab === 'specs' ? '#1e3a8a' : '#64748b',
-                borderBottom: activeTab === 'specs' ? '2px solid #1e3a8a' : '2px solid transparent',
-                cursor: 'pointer',
-                marginBottom: '-2px'
-              }}
-            >
-              Spesifikasi
-            </button>
-            <button
-              onClick={() => setActiveTab('maintenance')}
-              style={{
-                padding: '0.5rem 0.875rem',
-                border: 'none',
-                background: 'none',
-                fontWeight: activeTab === 'maintenance' ? 700 : 500,
-                color: activeTab === 'maintenance' ? '#1e3a8a' : '#64748b',
-                borderBottom: activeTab === 'maintenance' ? '2px solid #1e3a8a' : '2px solid transparent',
-                cursor: 'pointer',
-                marginBottom: '-2px'
-              }}
-            >
-              Maintenance ({maintenanceList.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              style={{
-                padding: '0.5rem 0.875rem',
-                border: 'none',
-                background: 'none',
-                fontWeight: activeTab === 'history' ? 700 : 500,
-                color: activeTab === 'history' ? '#1e3a8a' : '#64748b',
-                borderBottom: activeTab === 'history' ? '2px solid #1e3a8a' : '2px solid transparent',
-                cursor: 'pointer',
-                marginBottom: '-2px'
-              }}
-            >
-              Audit ({historyList.length})
-            </button>
-          </div>
-
-          {/* Section 1: Detailed Specs & Legal Specs */}
-          {(activeTab === 'specs' || window.innerWidth >= 768) && (
-            <div className="card" style={{ marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', color: '#1e3a8a' }}>
-                Spesifikasi Lengkap & Pengadaan
-              </h3>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.875rem', fontSize: '0.875rem' }}>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>MERK / BRAND</span>
-                  <strong>{item.brand || '-'}</strong>
-                </div>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>MODEL / TIPE</span>
-                  <strong>{item.model || '-'}</strong>
-                </div>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>SERI (S/N)</span>
-                  <strong>{item.serialNumber || '-'}</strong>
-                </div>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>TANGGAL PEROLEHAN</span>
-                  <strong>{item.purchaseDate || '-'}</strong>
-                </div>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>HARGA PEROLEHAN</span>
-                  <strong>{item.purchasePrice ? `Rp ${item.purchasePrice.toLocaleString('id-ID')}` : '-'}</strong>
-                </div>
-                <div>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>SUMBER DANA</span>
-                  <strong>{item.fundingSource || '-'}</strong>
+                <div style={{ lineHeight: 1.2 }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {user.name}
+                  </div>
+                  <div style={{ fontSize: '0.65rem', color: '#1e3a8a', fontWeight: 700, textTransform: 'uppercase' }}>
+                    {user.role}
+                  </div>
                 </div>
               </div>
 
-              <div style={{ marginTop: '0.875rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0', fontSize: '0.875rem' }}>
-                <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>DESKRIPSI / SPESIFIKASI</span>
-                <p style={{ marginTop: '0.25rem', color: '#334155' }}>{item.description || 'Tidak ada catatan deskripsi khusus.'}</p>
-              </div>
+              <button
+                onClick={handleLogout}
+                title="Keluar / Ganti Akun"
+                style={{
+                  background: 'none',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '0.4rem',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#ffffff'
+                }}
+              >
+                <LogOut size={16} />
+              </button>
             </div>
           )}
+        </div>
+      </header>
 
-          {/* Section 2: Maintenance Records */}
-          {(activeTab === 'maintenance' || window.innerWidth >= 768) && (
-            <div className="card" style={{ marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#1e3a8a' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Wrench size={18} />
-                  <span>Riwayat Maintenance</span>
-                </div>
-                <span className="badge badge-info">{maintenanceList.length} Record</span>
-              </h3>
+      {/* Main Content Area: Pure Item Details Only */}
+      <main style={{ flex: 1, padding: '1.25rem 1rem', maxWidth: '1100px', width: '100%', margin: '0 auto' }}>
+        {loading ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', margin: '2rem auto', maxWidth: '500px' }}>
+            <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#1e3a8a', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+            <h3 style={{ fontSize: '1.1rem', color: '#0f172a', marginBottom: '0.25rem' }}>Memuat Detail Barang...</h3>
+            <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Mengambil informasi aset dari pemindaian QR Code</p>
+          </div>
+        ) : error || !item ? (
+          <div className="card" style={{ textAlign: 'center', padding: '3rem 1.5rem', margin: '2rem auto', maxWidth: '500px' }}>
+            <div style={{ width: '56px', height: '56px', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+              <AlertCircle size={30} />
+            </div>
+            <h2 style={{ color: '#b91c1c', marginBottom: '0.5rem', fontSize: '1.25rem' }}>Barang Tidak Ditemukan</h2>
+            <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</p>
+          </div>
+        ) : (
+          <div>
+            {/* Scanned Badge Banner */}
+            <div
+              style={{
+                backgroundColor: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: '10px',
+                padding: '0.65rem 1rem',
+                marginBottom: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.5rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <QrCode size={18} color="#1e3a8a" />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e3a8a' }}>
+                  Detail Inventaris Logistik
+                </span>
+              </div>
+              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1e3a8a', fontFamily: 'monospace' }}>
+                {item.inventoryCode}
+              </span>
+            </div>
 
-              {maintenanceList.length === 0 ? (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>Belum ada riwayat maintenance tercatat.</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {maintenanceList.map(m => (
-                    <div key={m.id} style={{ padding: '0.75rem', borderRadius: '8px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, marginBottom: '0.25rem' }}>
-                        <span>{m.type} - {m.result}</span>
-                        <span style={{ color: '#64748b' }}>{m.date}</span>
+            {/* Main Grid Layout (2-column desktop / 1-column mobile) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+              
+              {/* Left Column: Hero Image, Action Buttons (Pinjam & Maintenance), Core Details */}
+              <div>
+                <div className="card" style={{ marginBottom: '1.25rem', textAlign: 'center' }}>
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }}
+                    />
+                  ) : (
+                    <div style={{ height: '160px', backgroundColor: '#f1f5f9', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                      Foto barang belum diunggah
+                    </div>
+                  )}
+
+                  <h2 style={{ color: '#0f172a', marginBottom: '0.25rem', fontSize: '1.35rem' }}>{item.name}</h2>
+                  <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.875rem' }}>
+                    {item.categoryNameSnapshot || 'Kategori Logistik'}
+                  </p>
+
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                    <span className={`badge ${item.condition === 'Baik' ? 'badge-success' : 'badge-danger'}`}>
+                      Kondisi: {item.condition}
+                    </span>
+                    <span className={`badge ${item.status === 'Tersedia' ? 'badge-success' : 'badge-warning'}`}>
+                      Status: {item.status}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons: Tombol Pinjam Barang & Tombol Maintenance */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', margin: '0.5rem 0 0.5rem', width: '100%' }}>
+                    {item.status === 'Tersedia' ? (
+                      <button
+                        onClick={openBorrowModal}
+                        className="btn btn-primary"
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem',
+                          fontSize: '0.95rem',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          borderRadius: '10px',
+                          boxShadow: '0 4px 10px rgba(30, 58, 138, 0.2)',
+                          transition: 'all 0.2s ease',
+                          cursor: 'pointer'
+                        }}
+                        title="Ajukan Peminjaman Barang Logistik Ini"
+                      >
+                        <Repeat size={18} />
+                        <span>Pinjam Barang Ini</span>
+                      </button>
+                    ) : item.status === 'Dipinjam' ? (
+                      <div
+                        style={{
+                          padding: '0.625rem 0.875rem',
+                          backgroundColor: '#eff6ff',
+                          border: '1px solid #bfdbfe',
+                          borderRadius: '8px',
+                          color: '#1e40af',
+                          fontSize: '0.825rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.4rem',
+                          fontWeight: 600
+                        }}
+                      >
+                        <Clock size={16} />
+                        <span>Status: Sedang Dipinjam</span>
                       </div>
-                      <div style={{ color: '#475569' }}><strong>Keluhan:</strong> {m.complaint}</div>
-                      <div style={{ color: '#475569' }}><strong>Tindakan:</strong> {m.action}</div>
-                      <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.25rem' }}>Teknisi: {m.technicianNameSnapshot}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                    ) : null}
 
-          {/* Section 3: Audit History */}
-          {(activeTab === 'history' || window.innerWidth >= 768) && (
-            <div className="card">
-              <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e3a8a' }}>
-                <History size={18} />
-                <span>Jejak Audit Barang</span>
-              </h3>
-
-              {historyList.length === 0 ? (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>Belum ada histori perubahan.</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '220px', overflowY: 'auto' }}>
-                  {historyList.map(h => (
-                    <div key={h.id} style={{ fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.375rem' }}>
-                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{h.description}</div>
-                      <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Oleh: {h.userName}</div>
-                    </div>
-                  ))}
+                    {/* Tombol Maintenance untuk Petugas / Admin */}
+                    {isStaff && (
+                      <button
+                        onClick={() => setShowMaintenanceModal(true)}
+                        className="btn btn-secondary"
+                        style={{
+                          width: '100%',
+                          padding: '0.65rem 1rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          borderRadius: '10px',
+                          backgroundColor: '#f8fafc',
+                          border: '1px solid #cbd5e1',
+                          color: '#334155',
+                          cursor: 'pointer'
+                        }}
+                        title="Catat Pemeliharaan / Perbaikan Barang"
+                      >
+                        <Wrench size={16} />
+                        <span>+ Catat Maintenance</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
-              )}
+
+                {/* Location & Responsible Person */}
+                <div className="card">
+                  <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e3a8a' }}>
+                    <MapPin size={18} />
+                    <span>Lokasi & Penanggung Jawab</span>
+                  </h3>
+
+                  <div style={{ fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>GEDUNG / RUANGAN</span>
+                      <strong style={{ color: '#0f172a' }}>{item.building || '-'}, Lantai {item.floor || '1'} ({item.room || '-'})</strong>
+                    </div>
+
+                    <div>
+                      <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>DETAIL POSISI</span>
+                      <span>{item.locationDetail || '-'}</span>
+                    </div>
+
+                    <div>
+                      <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>PENANGGUNG JAWAB ASET</span>
+                      <strong style={{ color: '#1e3a8a' }}>{item.responsiblePersonNameSnapshot || 'Dinas Logistik Sespimma'}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Specs, Maintenance & Audit History */}
+              <div>
+                {/* Mobile Tab Selectors (< 768px) */}
+                <div style={{ display: 'flex', borderBottom: '2px solid #e2e8f0', marginBottom: '1rem', gap: '0.5rem' }} className="mobile-detail-tabs">
+                  <button
+                    onClick={() => setActiveTab('specs')}
+                    style={{
+                      padding: '0.5rem 0.875rem',
+                      border: 'none',
+                      background: 'none',
+                      fontWeight: activeTab === 'specs' ? 700 : 500,
+                      color: activeTab === 'specs' ? '#1e3a8a' : '#64748b',
+                      borderBottom: activeTab === 'specs' ? '2px solid #1e3a8a' : '2px solid transparent',
+                      cursor: 'pointer',
+                      marginBottom: '-2px'
+                    }}
+                  >
+                    Spesifikasi
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('maintenance')}
+                    style={{
+                      padding: '0.5rem 0.875rem',
+                      border: 'none',
+                      background: 'none',
+                      fontWeight: activeTab === 'maintenance' ? 700 : 500,
+                      color: activeTab === 'maintenance' ? '#1e3a8a' : '#64748b',
+                      borderBottom: activeTab === 'maintenance' ? '2px solid #1e3a8a' : '2px solid transparent',
+                      cursor: 'pointer',
+                      marginBottom: '-2px'
+                    }}
+                  >
+                    Maintenance ({maintenanceList.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('history')}
+                    style={{
+                      padding: '0.5rem 0.875rem',
+                      border: 'none',
+                      background: 'none',
+                      fontWeight: activeTab === 'history' ? 700 : 500,
+                      color: activeTab === 'history' ? '#1e3a8a' : '#64748b',
+                      borderBottom: activeTab === 'history' ? '2px solid #1e3a8a' : '2px solid transparent',
+                      cursor: 'pointer',
+                      marginBottom: '-2px'
+                    }}
+                  >
+                    Audit ({historyList.length})
+                  </button>
+                </div>
+
+                {/* Section 1: Detailed Specs & Legal Specs */}
+                {(activeTab === 'specs' || window.innerWidth >= 768) && (
+                  <div className="card" style={{ marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', color: '#1e3a8a' }}>
+                      Spesifikasi Lengkap & Pengadaan
+                    </h3>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.875rem', fontSize: '0.875rem' }}>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>MERK / BRAND</span>
+                        <strong>{item.brand || '-'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>MODEL / TIPE</span>
+                        <strong>{item.model || '-'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>SERI (S/N)</span>
+                        <strong>{item.serialNumber || '-'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>TANGGAL PEROLEHAN</span>
+                        <strong>{item.purchaseDate || '-'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>HARGA PEROLEHAN</span>
+                        <strong>{item.purchasePrice ? `Rp ${item.purchasePrice.toLocaleString('id-ID')}` : '-'}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>SUMBER DANA</span>
+                        <strong>{item.fundingSource || '-'}</strong>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '0.875rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0', fontSize: '0.875rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>DESKRIPSI / SPESIFIKASI</span>
+                      <p style={{ marginTop: '0.25rem', color: '#334155' }}>{item.description || 'Tidak ada catatan deskripsi khusus.'}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 2: Maintenance Records */}
+                {(activeTab === 'maintenance' || window.innerWidth >= 768) && (
+                  <div className="card" style={{ marginBottom: '1.25rem' }}>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#1e3a8a' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Wrench size={18} />
+                        <span>Riwayat Maintenance</span>
+                      </div>
+                      <span className="badge badge-info">{maintenanceList.length} Record</span>
+                    </h3>
+
+                    {maintenanceList.length === 0 ? (
+                      <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>Belum ada riwayat maintenance tercatat.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {maintenanceList.map(m => (
+                          <div key={m.id} style={{ padding: '0.75rem', borderRadius: '8px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', fontSize: '0.85rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, marginBottom: '0.25rem' }}>
+                              <span>{m.type} - {m.result}</span>
+                              <span style={{ color: '#64748b' }}>{m.date}</span>
+                            </div>
+                            <div style={{ color: '#475569' }}><strong>Keluhan:</strong> {m.complaint}</div>
+                            <div style={{ color: '#475569' }}><strong>Tindakan:</strong> {m.action}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.25rem' }}>Teknisi: {m.technicianNameSnapshot}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Section 3: Audit History */}
+                {(activeTab === 'history' || window.innerWidth >= 768) && (
+                  <div className="card">
+                    <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e3a8a' }}>
+                      <History size={18} />
+                      <span>Jejak Audit Barang</span>
+                    </h3>
+
+                    {historyList.length === 0 ? (
+                      <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>Belum ada histori perubahan.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '220px', overflowY: 'auto' }}>
+                        {historyList.map(h => (
+                          <div key={h.id} style={{ fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.375rem' }}>
+                            <div style={{ fontWeight: 600, color: '#0f172a' }}>{h.description}</div>
+                            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Oleh: {h.userName}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
+      </main>
 
       {/* Add Maintenance Modal */}
       {showMaintenanceModal && (
@@ -563,25 +687,27 @@ export const ItemDetailPage: React.FC = () => {
             </div>
 
             {/* Item Mini Overview Pill */}
-            <div
-              style={{
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
-                padding: '0.625rem 0.875rem',
-                marginBottom: '1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '0.75rem'
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.875rem' }}>{item.name}</div>
-                <div style={{ fontSize: '0.75rem', color: '#1e3a8a', fontFamily: 'monospace', fontWeight: 600 }}>{item.inventoryCode}</div>
+            {item && (
+              <div
+                style={{
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '0.625rem 0.875rem',
+                  marginBottom: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.75rem'
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.875rem' }}>{item.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#1e3a8a', fontFamily: 'monospace', fontWeight: 600 }}>{item.inventoryCode}</div>
+                </div>
+                <span className="badge badge-success">Tersedia</span>
               </div>
-              <span className="badge badge-success">Tersedia</span>
-            </div>
+            )}
 
             <form onSubmit={handleCreateBorrowing}>
               {/* 1. Nama Peminjam */}
@@ -614,7 +740,7 @@ export const ItemDetailPage: React.FC = () => {
                 />
               </div>
 
-              {/* 3. Tanggal Pinjam & Estimasi Kembali (Responsive 2-column Grid) */}
+              {/* 3. Tanggal Pinjam & Estimasi Kembali */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
                 <div className="form-group" style={{ margin: 0 }}>
                   <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
@@ -681,6 +807,14 @@ export const ItemDetailPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Official Sespimma Polri Footer */}
+      <footer style={{ padding: '1rem 1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', backgroundColor: '#ffffff', marginTop: 'auto', lineHeight: 1.6 }}>
+        <div>Hak Cipta © 2026 Sistem Inventaris Logistik - Sespimma Lemdiklat Polri. All rights reserved.</div>
+        <div style={{ marginTop: '0.25rem' }}>
+          Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
+        </div>
+      </footer>
 
       <style>{`
         @media (min-width: 768px) {

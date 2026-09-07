@@ -27,10 +27,10 @@ export const AppLayout: React.FC = () => {
         <main className="content-body">
           <Outlet />
         </main>
-        <footer style={{ padding: '1rem 1.5rem', textAlign: 'center', fontSize: '0.8rem', color: '#64748b', borderTop: '1px solid #e2e8f0', backgroundColor: '#ffffff', marginTop: 'auto' }}>
+        <footer style={{ padding: '1rem 1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', backgroundColor: '#ffffff', marginTop: 'auto', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sistem Inventaris Logistik - Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.25rem', fontSize: '0.75rem' }}>
-            Created by <strong style={{ color: '#1e293b' }}>M Nata Jayndra Permana</strong> &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: '#1e3a8a', textDecoration: 'none', fontWeight: 600 }}>natajp81@gmail.com</a>
+          <div style={{ marginTop: '0.25rem' }}>
+            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
           </div>
         </footer>
       </div>

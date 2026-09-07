@@ -38,6 +38,7 @@ export const App: React.FC = () => {
               </ProtectedRoute>
             }
           >
+            {/* Protected Main Layout Routes with Sidebar & Header */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/items" element={<ItemListPage />} />
@@ -57,9 +58,6 @@ export const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
-            {/* Deep link QR scan target */}
-            <Route path="/item/:inventoryCode" element={<ItemDetailPage />} />
 
             <Route path="/qr-print" element={<QRPrintPage />} />
             <Route path="/borrowings" element={<BorrowingPage />} />
@@ -98,6 +96,16 @@ export const App: React.FC = () => {
             />
             <Route path="/scan-logs" element={<ScanHistoryPage />} />
           </Route>
+
+          {/* Standalone Route for QR Code Scan Result (No Sidebar, No Back Button, Login Required) */}
+          <Route
+            path="/item/:inventoryCode"
+            element={
+              <ProtectedRoute>
+                <ItemDetailPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

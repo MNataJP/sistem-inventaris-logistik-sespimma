@@ -111,10 +111,10 @@ export const ForgotPasswordPage: React.FC = () => {
           </form>
         )}
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.6 }}>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.35rem', color: '#64748b', fontSize: '0.75rem' }}>
-            Created by <strong style={{ color: '#334155' }}>M Nata Jayndra Permana</strong>
+          <div style={{ marginTop: '0.25rem' }}>
+            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
           </div>
         </div>
       </div>

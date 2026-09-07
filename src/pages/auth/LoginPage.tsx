@@ -3,11 +3,12 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { Shield, Lock, Mail, AlertCircle, UserPlus } from 'lucide-react';
+import { Shield, Lock, Mail, AlertCircle, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +16,13 @@ export const LoginPage: React.FC = () => {
   const location = useLocation();
 
   // Redirect destination after login (defaults to /dashboard or originally scanned item URL)
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const fromState = (location.state as any)?.from;
+  let from = '/dashboard';
+  if (typeof fromState === 'string') {
+    from = fromState;
+  } else if (fromState?.pathname) {
+    from = fromState.pathname + (fromState.search || '') + (fromState.hash || '');
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,15 +181,36 @@ export const LoginPage: React.FC = () => {
             <div style={{ position: 'relative' }}>
               <input
                 id="password-input"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 className="form-input"
-                style={{ paddingLeft: '2.5rem' }}
+                style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
                 placeholder="••••••••"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
               <Lock size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <button
+                type="button"
+                onClick={() => setShowPassword(prev => !prev)}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#94a3b8',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
             {/* Lupa Kata Sandi diletakkan di bawah form input kata sandi */}
             <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
@@ -210,10 +238,10 @@ export const LoginPage: React.FC = () => {
           </Link>
         </div>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.6 }}>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.35rem', color: '#64748b', fontSize: '0.75rem' }}>
-            Created by <strong style={{ color: '#334155' }}>M Nata Jayndra Permana</strong>
+          <div style={{ marginTop: '0.25rem' }}>
+            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
           </div>
         </div>
       </div>

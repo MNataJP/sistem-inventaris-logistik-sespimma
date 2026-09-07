@@ -15,7 +15,9 @@ import {
   AlertCircle,
   CheckCircle2,
   ArrowLeft,
-  Clock
+  Clock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
@@ -26,6 +28,8 @@ export const RegisterPage: React.FC = () => {
   const [role, setRole] = useState<UserRole>('user');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -305,20 +309,41 @@ export const RegisterPage: React.FC = () => {
                 </select>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
                   <label className="form-label">Kata Sandi</label>
                   <div style={{ position: 'relative' }}>
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       className="form-input"
-                      style={{ paddingLeft: '2.5rem' }}
+                      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
                       placeholder="••••••••"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                     />
                     <Lock size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(prev => !prev)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.75rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#94a3b8',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -326,15 +351,36 @@ export const RegisterPage: React.FC = () => {
                   <label className="form-label">Konfirmasi Sandi</label>
                   <div style={{ position: 'relative' }}>
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       required
                       className="form-input"
-                      style={{ paddingLeft: '2.5rem' }}
+                      style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
                     />
                     <Lock size={18} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(prev => !prev)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.75rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#94a3b8',
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title={showConfirmPassword ? 'Sembunyikan konfirmasi sandi' : 'Tampilkan konfirmasi sandi'}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -358,10 +404,10 @@ export const RegisterPage: React.FC = () => {
           </>
         )}
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', lineHeight: 1.6 }}>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.35rem', color: '#64748b', fontSize: '0.75rem' }}>
-            Created by <strong style={{ color: '#334155' }}>M Nata Jayndra Permana</strong>
+          <div style={{ marginTop: '0.25rem' }}>
+            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
           </div>
         </div>
       </div>
