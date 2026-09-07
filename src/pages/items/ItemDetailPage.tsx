@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getItemByInventoryCode, getItemHistory } from '@/services/inventoryService';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { getItemByInventoryCode, getItemHistory, uploadItemPhoto, updateInventoryItem } from '@/services/inventoryService';
 import { getMaintenanceHistory, createMaintenanceRecord } from '@/services/maintenanceService';
 import { recordScanLog } from '@/services/scanLogService';
 import { createBorrowing } from '@/services/borrowingService';
@@ -18,7 +18,12 @@ import {
   QrCode,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  LayoutDashboard,
+  Camera,
+  Image as ImageIcon,
+  Boxes
 } from 'lucide-react';
 
 export const ItemDetailPage: React.FC = () => {
@@ -31,6 +36,10 @@ export const ItemDetailPage: React.FC = () => {
   const [maintenanceList, setMaintenanceList] = useState<MaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Direct Photo Upload for Staff (Super Admin, Admin, Petugas)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Active Tab for Mobile View (specs | maintenance | history)
   const [activeTab, setActiveTab] = useState<'specs' | 'maintenance' | 'history'>('specs');
@@ -100,6 +109,41 @@ export const ItemDetailPage: React.FC = () => {
       navigate('/login', { replace: true });
     } catch (err) {
       console.error('Logout error:', err);
+    }
+  };
+
+  const handleTriggerUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !item) return;
+    const file = e.target.files[0];
+    setUploadingPhoto(true);
+    try {
+      // 1. Upload & compress image instantly
+      const newImageUrl = await uploadItemPhoto(item.id, file);
+
+      // 2. Update Firestore item document
+      await updateInventoryItem(
+        item.id,
+        { imageUrl: newImageUrl },
+        undefined,
+        user?.uid,
+        user?.name
+      );
+
+      // 3. Update local state
+      setItem(prev => (prev ? { ...prev, imageUrl: newImageUrl } : null));
+      alert('Foto barang berhasil diperbarui!');
+    } catch (err: any) {
+      console.error('Error uploading photo:', err);
+      alert('Gagal mengunggah foto: ' + (err.message || 'Terjadi kesalahan'));
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -187,11 +231,12 @@ export const ItemDetailPage: React.FC = () => {
     }
   };
 
+  // Roles: Super Admin, Admin, and Petugas are Staff
   const isStaff = user?.role === 'super_admin' || user?.role === 'admin' || user?.role === 'petugas';
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
-      {/* Official Sespimma Polri Header (Without Sidebar Navigation) */}
+      {/* Official Sespimma Polri Header */}
       <header
         style={{
           backgroundColor: '#ffffff',
@@ -293,8 +338,38 @@ export const ItemDetailPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area: Pure Item Details Only */}
+      {/* Main Content Area */}
       <main style={{ flex: 1, padding: '1.25rem 1rem', maxWidth: '1100px', width: '100%', margin: '0 auto' }}>
+        {/* Navigation Bar: HANYA DITAMPILKAN UNTUK SUPER ADMIN, ADMIN, DAN PETUGAS */}
+        {isStaff && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '1rem',
+              flexWrap: 'wrap',
+              gap: '0.625rem',
+              paddingBottom: '0.75rem',
+              borderBottom: '1px solid #e2e8f0'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Link to="/items" className="btn btn-secondary btn-sm" title="Kembali ke Daftar Barang Inventaris">
+                <ArrowLeft size={16} />
+                <span>Kembali ke Daftar Barang</span>
+              </Link>
+              <Link to="/dashboard" className="btn btn-secondary btn-sm" title="Buka Dashboard Logistik">
+                <LayoutDashboard size={16} />
+                <span>Dashboard</span>
+              </Link>
+            </div>
+            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+              Panel Staf Logistik Sespimma
+            </span>
+          </div>
+        )}
+
         {loading ? (
           <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem', margin: '2rem auto', maxWidth: '500px' }}>
             <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#1e3a8a', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
@@ -308,6 +383,11 @@ export const ItemDetailPage: React.FC = () => {
             </div>
             <h2 style={{ color: '#b91c1c', marginBottom: '0.5rem', fontSize: '1.25rem' }}>Barang Tidak Ditemukan</h2>
             <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</p>
+            {isStaff && (
+              <Link to="/items" className="btn btn-primary btn-sm">
+                Kembali ke Daftar Barang
+              </Link>
+            )}
           </div>
         ) : (
           <div>
@@ -344,14 +424,52 @@ export const ItemDetailPage: React.FC = () => {
               <div>
                 <div className="card" style={{ marginBottom: '1.25rem', textAlign: 'center' }}>
                   {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }}
-                    />
+                    <div style={{ position: 'relative', width: '100%', marginBottom: '0.875rem' }}>
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '10px' }}
+                      />
+                    </div>
                   ) : (
-                    <div style={{ height: '160px', backgroundColor: '#f1f5f9', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                      Foto barang belum diunggah
+                    <div style={{ height: '160px', backgroundColor: '#f1f5f9', borderRadius: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', marginBottom: '0.875rem', gap: '0.35rem', fontSize: '0.875rem' }}>
+                      <ImageIcon size={32} />
+                      <span>Foto barang belum diunggah</span>
+                    </div>
+                  )}
+
+                  {/* FITUR UNGGAH / GANTI FOTO: HANYA UNTUK SUPER ADMIN, ADMIN, DAN PETUGAS */}
+                  {isStaff && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handlePhotoUpload}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleTriggerUpload}
+                        disabled={uploadingPhoto}
+                        className="btn btn-secondary btn-sm"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          backgroundColor: '#eff6ff',
+                          borderColor: '#bfdbfe',
+                          color: '#1e40af',
+                          fontWeight: 600,
+                          fontSize: '0.8rem',
+                          padding: '0.4rem 0.85rem',
+                          borderRadius: '8px'
+                        }}
+                        title="Unggah atau perbarui foto fisik barang"
+                      >
+                        <Camera size={15} />
+                        <span>{uploadingPhoto ? 'Mengunggah Foto...' : (item.imageUrl ? 'Ganti Foto Barang' : 'Unggah Foto Barang')}</span>
+                      </button>
                     </div>
                   )}
 

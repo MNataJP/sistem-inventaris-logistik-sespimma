@@ -30,10 +30,10 @@ export const App: React.FC = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-          {/* Protected Main Layout Routes */}
+          {/* Protected Main Layout Routes (Only for Super Admin, Admin, and Petugas) */}
           <Route
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['super_admin', 'admin', 'petugas']}>
                 <AppLayout />
               </ProtectedRoute>
             }

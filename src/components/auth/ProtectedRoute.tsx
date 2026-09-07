@@ -147,21 +147,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
             Peran akun Anda (<strong>{user.role.toUpperCase()}</strong>) tidak memiliki izin untuk mengakses modul ini.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="btn btn-secondary"
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-            >
-              <ArrowLeft size={16} />
-              <span>Dashboard</span>
-            </button>
+            {user.role !== 'user' && (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="btn btn-secondary"
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+              >
+                <ArrowLeft size={16} />
+                <span>Dashboard</span>
+              </button>
+            )}
             <button
               onClick={handleLogoutAndRedirect}
               className="btn btn-primary"
               style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >
               <LogOut size={16} />
-              <span>Ganti Akun</span>
+              <span>Keluar / Ganti Akun</span>
             </button>
           </div>
         </div>
