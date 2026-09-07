@@ -53,10 +53,54 @@ export const ItemDetailPage: React.FC = () => {
   const [maintComplaint, setMaintComplaint] = useState('');
   const [maintAction, setMaintAction] = useState('');
   const [maintTech, setMaintTech] = useState('');
-  const [maintCost, setMaintCost] = useState(0);
+  const [maintCostRaw, setMaintCostRaw] = useState<string>('');
   const [maintResult, setMaintResult] = useState('Selesai dengan Baik');
   const [maintNextDate, setMaintNextDate] = useState('');
   const [maintSubmitting, setMaintSubmitting] = useState(false);
+
+  // Helper to format timestamps for audit logs
+  const formatAuditTimestamp = (ts: any): string => {
+    if (!ts) return '-';
+    try {
+      if (ts.toDate && typeof ts.toDate === 'function') {
+        return ts.toDate().toLocaleString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+      if (ts.seconds) {
+        return new Date(ts.seconds * 1000).toLocaleString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+      const d = new Date(ts);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+    } catch (e) {
+      console.error('Error formatting audit timestamp', e);
+    }
+    return '-';
+  };
+
+  const handleMaintCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numeric characters (digits)
+    const digitsOnly = e.target.value.replace(/\D/g, '');
+    setMaintCostRaw(digitsOnly);
+  };
 
   // Borrow Form state
   const [borrowerName, setBorrowerName] = useState(user?.name || '');
@@ -152,6 +196,8 @@ export const ItemDetailPage: React.FC = () => {
     if (!item) return;
     setMaintSubmitting(true);
     try {
+      const parsedCost = maintCostRaw ? parseInt(maintCostRaw, 10) : 0;
+
       await createMaintenanceRecord(
         item.id,
         {
@@ -160,7 +206,7 @@ export const ItemDetailPage: React.FC = () => {
           complaint: maintComplaint,
           action: maintAction,
           technicianNameSnapshot: maintTech || user?.name || 'Petugas',
-          cost: Number(maintCost),
+          cost: parsedCost,
           result: maintResult,
           nextMaintenanceDate: maintNextDate,
         },
@@ -169,6 +215,12 @@ export const ItemDetailPage: React.FC = () => {
         user?.name
       );
 
+      // Reset form states
+      setMaintComplaint('');
+      setMaintAction('');
+      setMaintTech('');
+      setMaintCostRaw('');
+      setMaintNextDate('');
       setShowMaintenanceModal(false);
       await fetchItemData();
     } catch (err: any) {
@@ -714,19 +766,30 @@ export const ItemDetailPage: React.FC = () => {
                 {/* Section 3: Audit History */}
                 {(activeTab === 'history' || window.innerWidth >= 768) && (
                   <div className="card">
-                    <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#1e3a8a' }}>
-                      <History size={18} />
-                      <span>Jejak Audit Barang</span>
+                    <h3 style={{ fontSize: '1rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#1e3a8a' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <History size={18} />
+                        <span>Jejak Audit Barang</span>
+                      </div>
+                      <span className="badge badge-info">{historyList.length} Log</span>
                     </h3>
 
                     {historyList.length === 0 ? (
                       <p style={{ color: '#94a3b8', fontSize: '0.875rem', fontStyle: 'italic' }}>Belum ada histori perubahan.</p>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '220px', overflowY: 'auto' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', maxHeight: '250px', overflowY: 'auto' }}>
                         {historyList.map(h => (
-                          <div key={h.id} style={{ fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.375rem' }}>
-                            <div style={{ fontWeight: 600, color: '#0f172a' }}>{h.description}</div>
-                            <div style={{ color: '#64748b', fontSize: '0.75rem' }}>Oleh: {h.userName}</div>
+                          <div key={h.id} style={{ fontSize: '0.8rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                              <div style={{ fontWeight: 600, color: '#0f172a' }}>{h.description}</div>
+                              <div style={{ color: '#64748b', fontSize: '0.725rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <Clock size={12} color="#94a3b8" />
+                                <span>{formatAuditTimestamp(h.timestamp)}</span>
+                              </div>
+                            </div>
+                            <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                              Oleh: <strong style={{ color: '#334155' }}>{h.userName}</strong>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -771,8 +834,34 @@ export const ItemDetailPage: React.FC = () => {
                 <input type="text" className="form-input" value={maintTech} onChange={e => setMaintTech(e.target.value)} placeholder="Nama Petugas / Teknisi" />
               </div>
               <div className="form-group">
-                <label className="form-label">Biaya (IDR)</label>
-                <input type="number" className="form-input" value={maintCost} onChange={e => setMaintCost(Number(e.target.value))} />
+                <label className="form-label">Biaya Pemeliharaan (IDR)</label>
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '0.75rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      fontWeight: 600,
+                      color: '#64748b',
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="form-input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="Contoh: 150.000 (Kosongkan jika gratis)"
+                    value={maintCostRaw ? Number(maintCostRaw).toLocaleString('id-ID') : ''}
+                    onChange={handleMaintCostChange}
+                  />
+                </div>
+                <small style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>
+                  Hanya menerima angka. Format ribuan otomatis disesuaikan.
+                </small>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
                 <button type="button" onClick={() => setShowMaintenanceModal(false)} className="btn btn-secondary">Batal</button>
