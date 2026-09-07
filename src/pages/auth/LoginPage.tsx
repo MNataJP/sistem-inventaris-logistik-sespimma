@@ -15,14 +15,18 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Redirect destination after login (defaults to /dashboard or originally scanned item URL)
+  // Redirect destination:
+  // HANYA jika berasal dari pemindaian QR Code (/item/:inventoryCode) maka langsung ke detail barang tersebut.
+  // Untuk login biasa / login dengan akun lain, tampilan awal PASTI SELALU diarahkan ke /dashboard.
   const fromState = (location.state as any)?.from;
-  let from = '/dashboard';
+  let targetPath = '';
   if (typeof fromState === 'string') {
-    from = fromState;
+    targetPath = fromState;
   } else if (fromState?.pathname) {
-    from = fromState.pathname + (fromState.search || '') + (fromState.hash || '');
+    targetPath = fromState.pathname + (fromState.search || '') + (fromState.hash || '');
   }
+
+  const destination = targetPath.startsWith('/item/') ? targetPath : '/dashboard';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +73,7 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      navigate(from, { replace: true });
+      navigate(destination, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {

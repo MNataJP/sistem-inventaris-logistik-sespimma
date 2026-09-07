@@ -373,6 +373,26 @@ button, input, select, textarea {
   box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
 }
 
+/* Sembunyikan ikon mata & clear bawaan browser (Edge/Chrome/IE) agar tidak ganda */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden !important;
+  display: none !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+}
+
 /* Modal Window */
 .modal-overlay {
   position: fixed;

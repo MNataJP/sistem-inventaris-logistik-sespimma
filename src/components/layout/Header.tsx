@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Menu, LogOut, ShieldCheck } from 'lucide-react';
 
@@ -8,6 +9,17 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      navigate('/login', { replace: true });
+    }
+  };
 
   return (
     <header className="header-bar">
@@ -63,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               {user.name.charAt(0).toUpperCase()}
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="btn btn-secondary btn-sm"
               title="Keluar / Logout"
               style={{ color: '#b91c1c', borderColor: '#fca5a5', padding: '0.375rem 0.625rem' }}

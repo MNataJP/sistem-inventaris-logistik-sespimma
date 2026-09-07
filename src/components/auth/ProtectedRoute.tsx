@@ -27,8 +27,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   }
 
   if (!user) {
-    // Redirect to login page and retain current location state for return after auth
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Hanya simpan return path jika user secara spesifik mengakses URL hasil scan QR (/item/:inventoryCode)
+    // Untuk halaman umum/modul admin, tidak menyimpan state agar saat login dengan akun lain selalu masuk ke /dashboard
+    const returnState = location.pathname.startsWith('/item/') ? { from: location } : undefined;
+    return <Navigate to="/login" state={returnState} replace />;
   }
 
   const handleLogoutAndRedirect = async () => {
