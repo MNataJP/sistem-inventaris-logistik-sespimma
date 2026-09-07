@@ -4,7 +4,7 @@ import { createInventoryItem, getItemById, updateInventoryItem } from '@/service
 import { getCategories, getLocations } from '@/services/masterDataService';
 import { Category, Location, ItemCondition, ItemStatus } from '@/types/inventory';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Upload, X, Image as ImageIcon } from 'lucide-react';
 
 export const ItemFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,7 @@ export const ItemFormPage: React.FC = () => {
   const [serialNumber, setSerialNumber] = useState('');
   const [description, setDescription] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
-  const [purchasePrice, setPurchasePrice] = useState<number>(0);
+  const [purchasePrice, setPurchasePrice] = useState<string>('');
   const [fundingSource, setFundingSource] = useState('APBN 2026');
   const [vendor, setVendor] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
@@ -38,6 +38,7 @@ export const ItemFormPage: React.FC = () => {
   const [locationDetail, setLocationDetail] = useState('');
   const [responsiblePersonName, setResponsiblePersonName] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
   const [existingImageUrl, setExistingImageUrl] = useState('');
 
   useEffect(() => {
@@ -55,23 +56,25 @@ export const ItemFormPage: React.FC = () => {
         if (isEdit && id) {
           const item = await getItemById(id);
           if (item) {
-            setName(item.name);
-            setCategoryId(item.categoryId);
-            setBrand(item.brand);
-            setModel(item.model);
-            setSerialNumber(item.serialNumber);
-            setDescription(item.description);
-            setPurchaseDate(item.purchaseDate);
-            setPurchasePrice(item.purchasePrice);
-            setFundingSource(item.fundingSource);
-            setVendor(item.vendor);
-            setDocumentNumber(item.documentNumber);
-            setCondition(item.condition);
-            setStatus(item.status);
-            setBuilding(item.building);
-            setFloor(item.floor);
-            setRoom(item.room);
-            setLocationDetail(item.locationDetail);
+            setName(item.name || '');
+            setCategoryId(item.categoryId || '');
+            setBrand(item.brand || '');
+            setModel(item.model || '');
+            setSerialNumber(item.serialNumber || '');
+            setDescription(item.description || '');
+            setPurchaseDate(item.purchaseDate || '');
+            setPurchasePrice(
+              item.purchasePrice ? new Intl.NumberFormat('id-ID').format(item.purchasePrice) : ''
+            );
+            setFundingSource(item.fundingSource || 'APBN 2026');
+            setVendor(item.vendor || '');
+            setDocumentNumber(item.documentNumber || '');
+            setCondition(item.condition || 'Baik');
+            setStatus(item.status || 'Tersedia');
+            setBuilding(item.building || '');
+            setFloor(item.floor || '1');
+            setRoom(item.room || '');
+            setLocationDetail(item.locationDetail || '');
             setResponsiblePersonName(item.responsiblePersonNameSnapshot || '');
             setExistingImageUrl(item.imageUrl || '');
           }
@@ -85,9 +88,35 @@ export const ItemFormPage: React.FC = () => {
     fetchData();
   }, [id, isEdit]);
 
+  // Handle formatted numeric price input (only digits, formatted with thousand separators)
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value.replace(/\D/g, '');
+    if (!rawVal) {
+      setPurchasePrice('');
+      return;
+    }
+    const num = Number(rawVal);
+    const formatted = new Intl.NumberFormat('id-ID').format(num);
+    setPurchasePrice(formatted);
+  };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview('');
+    setExistingImageUrl('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !categoryId) {
+    if (!name.trim() || !categoryId) {
       setError('Nama barang dan Kategori wajib diisi.');
       return;
     }
@@ -99,26 +128,29 @@ export const ItemFormPage: React.FC = () => {
       const selectedCat = categories.find(c => c.id === categoryId);
       const categoryNameSnapshot = selectedCat ? selectedCat.name : '';
 
+      // Parse numeric price without formatting dots
+      const cleanNumericPrice = purchasePrice ? Number(purchasePrice.replace(/\D/g, '')) : 0;
+
       const payload = {
-        name,
+        name: name.trim(),
         categoryId,
         categoryNameSnapshot,
-        brand,
-        model,
-        serialNumber,
-        description,
+        brand: brand.trim(),
+        model: model.trim(),
+        serialNumber: serialNumber.trim(),
+        description: description.trim(),
         purchaseDate,
-        purchasePrice: Number(purchasePrice),
-        fundingSource,
-        vendor,
-        documentNumber,
+        purchasePrice: cleanNumericPrice,
+        fundingSource: fundingSource.trim(),
+        vendor: vendor.trim(),
+        documentNumber: documentNumber.trim(),
         condition,
         status,
-        building,
-        floor,
-        room,
-        locationDetail,
-        responsiblePersonNameSnapshot: responsiblePersonName,
+        building: building.trim(),
+        floor: floor.trim(),
+        room: room.trim(),
+        locationDetail: locationDetail.trim(),
+        responsiblePersonNameSnapshot: responsiblePersonName.trim(),
         imageUrl: existingImageUrl,
         isActive: true,
       };
@@ -152,7 +184,7 @@ export const ItemFormPage: React.FC = () => {
 
       {error && (
         <div className="card" style={{ backgroundColor: '#fee2e2', color: '#b91c1c', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <AlertCircle size={18} />
+          <AlertCircle size={18} style={{ flexShrink: 0 }} />
           <span>{error}</span>
         </div>
       )}
@@ -280,7 +312,30 @@ export const ItemFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Harga Perolehan (IDR)</label>
-                <input type="number" className="form-input" placeholder="0" value={purchasePrice} onChange={e => setPurchasePrice(Number(e.target.value))} />
+                <div style={{ position: 'relative' }}>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: '0.85rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: '#64748b',
+                      fontWeight: 600,
+                      fontSize: '0.875rem'
+                    }}
+                  >
+                    Rp
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="form-input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="Contoh: 1.500.000 (Ketik angka saja)"
+                    value={purchasePrice}
+                    onChange={handlePriceChange}
+                  />
+                </div>
               </div>
 
               <div className="form-group">
@@ -295,33 +350,54 @@ export const ItemFormPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Section 4: Photo Upload */}
+          {/* Section 4: Photo Upload with Preview & Instant Compression */}
           <div className="card" style={{ marginBottom: '1.25rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', color: '#1e3a8a' }}>
               4. Foto Fisik Barang
             </h3>
 
             <div className="form-group">
-              <label className="form-label">Pilih Foto (JPG / PNG, Max 5MB)</label>
+              <label className="form-label">Pilih Foto Fisik Barang (Kamera HP / Galeri)</label>
               <input
                 type="file"
                 accept="image/*"
                 className="form-input"
-                onChange={e => {
-                  if (e.target.files && e.target.files[0]) {
-                    setPhotoFile(e.target.files[0]);
-                  }
-                }}
+                onChange={handlePhotoSelect}
               />
+              <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                Foto akan otomatis dikompresi & dioptimasi agar proses unggah cepat dan hemat kuota.
+              </span>
             </div>
 
-            {(photoFile || existingImageUrl) && (
-              <div style={{ marginTop: '0.75rem', textAlign: 'center' }}>
+            {(photoPreview || existingImageUrl) && (
+              <div
+                style={{
+                  marginTop: '0.875rem',
+                  padding: '1rem',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '10px',
+                  border: '1px dashed #cbd5e1',
+                  textAlign: 'center',
+                  position: 'relative',
+                  display: 'inline-block'
+                }}
+              >
                 <img
-                  src={photoFile ? URL.createObjectURL(photoFile) : existingImageUrl}
+                  src={photoPreview || existingImageUrl}
                   alt="Preview Barang"
-                  style={{ maxHeight: '180px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
                 />
+                <div style={{ marginTop: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="btn btn-secondary btn-sm"
+                    style={{ color: '#b91c1c', borderColor: '#fca5a5', padding: '0.25rem 0.625rem', fontSize: '0.75rem' }}
+                  >
+                    <X size={14} />
+                    <span>Hapus / Ganti Foto</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -330,9 +406,14 @@ export const ItemFormPage: React.FC = () => {
             <Link to="/items" className="btn btn-secondary" style={{ flex: '1 0 100px' }}>
               Batal
             </Link>
-            <button type="submit" disabled={saving} className="btn btn-primary" style={{ flex: '2 0 160px', padding: '0.75rem 1.5rem' }}>
+            <button
+              type="submit"
+              disabled={saving}
+              className="btn btn-primary"
+              style={{ flex: '2 0 180px', padding: '0.75rem 1.5rem', fontWeight: 600 }}
+            >
               <Save size={18} />
-              <span>{saving ? 'Menyimpan...' : 'Simpan Data Barang'}</span>
+              <span>{saving ? 'Menyimpan & Mengunggah Foto...' : 'Simpan Data Barang'}</span>
             </button>
           </div>
         </form>

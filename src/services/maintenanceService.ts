@@ -14,13 +14,17 @@ import { MaintenanceRecord } from '@/types/maintenance';
 import { updateInventoryItem, addHistoryRecord } from './inventoryService';
 import { recordAuditLog } from './auditService';
 import { removeUndefined } from '@/utils/firestoreHelper';
+import { compressImage } from '@/utils/imageCompressor';
 
 /**
- * Upload maintenance document/photo attachment
+ * Upload maintenance document/photo attachment with compression
  */
 export async function uploadMaintenanceAttachment(itemId: string, maintenanceId: string, file: File): Promise<string> {
-  const storageRef = ref(storage, `items/${itemId}/maintenance/${maintenanceId}/${Date.now()}_${file.name}`);
-  const snapshot = await uploadBytes(storageRef, file);
+  const compressedFile = await compressImage(file, 1280, 1280, 0.8);
+  const storageRef = ref(storage, `items/${itemId}/maintenance/${maintenanceId}/${Date.now()}_${compressedFile.name}`);
+  const snapshot = await uploadBytes(storageRef, compressedFile, {
+    contentType: compressedFile.type || 'image/jpeg',
+  });
   return await getDownloadURL(snapshot.ref);
 }
 

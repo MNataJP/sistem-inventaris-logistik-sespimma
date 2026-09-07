@@ -17,6 +17,7 @@ import { db, storage } from '@/lib/firebase';
 import { InventoryItem, InventoryHistoryRecord } from '@/types/inventory';
 import { recordAuditLog } from './auditService';
 import { removeUndefined } from '@/utils/firestoreHelper';
+import { compressImage } from '@/utils/imageCompressor';
 
 const COLLECTION_ITEMS = 'items';
 
@@ -56,11 +57,14 @@ export async function generateUniqueInventoryCode(): Promise<string> {
 }
 
 /**
- * Upload item photo to Firebase Storage
+ * Upload item photo to Firebase Storage with automatic client-side compression
  */
 export async function uploadItemPhoto(itemId: string, file: File): Promise<string> {
-  const storageRef = ref(storage, `items/${itemId}/${Date.now()}_${file.name}`);
-  const snapshot = await uploadBytes(storageRef, file);
+  const compressedFile = await compressImage(file, 1280, 1280, 0.8);
+  const storageRef = ref(storage, `items/${itemId}/${Date.now()}_${compressedFile.name}`);
+  const snapshot = await uploadBytes(storageRef, compressedFile, {
+    contentType: compressedFile.type || 'image/jpeg',
+  });
   return await getDownloadURL(snapshot.ref);
 }
 
