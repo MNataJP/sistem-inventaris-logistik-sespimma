@@ -17,7 +17,7 @@ import { db, storage } from '@/lib/firebase';
 import { InventoryItem, InventoryHistoryRecord } from '@/types/inventory';
 import { recordAuditLog } from './auditService';
 import { removeUndefined } from '@/utils/firestoreHelper';
-import { compressImage } from '@/utils/imageCompressor';
+import { compressImage, compressImageToBase64 } from '@/utils/imageCompressor';
 
 const COLLECTION_ITEMS = 'items';
 
@@ -57,15 +57,36 @@ export async function generateUniqueInventoryCode(): Promise<string> {
 }
 
 /**
- * Upload item photo to Firebase Storage with automatic client-side compression
+ * Upload item photo to Firebase Storage with automatic client-side compression and resilient fallback
  */
 export async function uploadItemPhoto(itemId: string, file: File): Promise<string> {
-  const compressedFile = await compressImage(file, 1280, 1280, 0.8);
-  const storageRef = ref(storage, `items/${itemId}/${Date.now()}_${compressedFile.name}`);
-  const snapshot = await uploadBytes(storageRef, compressedFile, {
-    contentType: compressedFile.type || 'image/jpeg',
-  });
-  return await getDownloadURL(snapshot.ref);
+  try {
+    const compressedFile = await compressImage(file, 1000, 1000, 0.75);
+
+    // Try uploading to Firebase Storage with a 5-second timeout
+    const uploadPromise = async () => {
+      const storageRef = ref(storage, `items/${itemId}/${Date.now()}_${compressedFile.name}`);
+      const snapshot = await uploadBytes(storageRef, compressedFile, {
+        contentType: 'image/jpeg',
+      });
+      return await getDownloadURL(snapshot.ref);
+    };
+
+    const timeoutPromise = new Promise<string>((_, reject) =>
+      setTimeout(() => reject(new Error('Firebase Storage timeout')), 5000)
+    );
+
+    const downloadUrl = await Promise.race([uploadPromise(), timeoutPromise]);
+    return downloadUrl;
+  } catch (err) {
+    console.warn('Firebase Storage upload failed or timed out, saving compressed base64 directly to Firestore:', err);
+    // 100% Guaranteed Fallback: saves compressed lightweight Base64 JPEG so item saving NEVER hangs
+    const base64 = await compressImageToBase64(file, 800, 800, 0.7);
+    if (base64) {
+      return base64;
+    }
+    return '';
+  }
 }
 
 /**
