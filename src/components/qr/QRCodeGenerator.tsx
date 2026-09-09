@@ -97,6 +97,11 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
           <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1e3a8a', fontFamily: 'monospace', marginTop: '0.1rem' }}>
             {inventoryCode}
           </div>
+          {item?.serialNumber && (
+            <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.1rem', fontWeight: 500 }}>
+              No. Seri: {item.serialNumber}
+            </div>
+          )}
           <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '0.2rem' }}>
             SESPIMMA LEMDIKLAT POLRI
           </div>
@@ -140,7 +145,12 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 
             <div style={{ marginBottom: '1.25rem' }}>
               <strong style={{ fontSize: '1rem', color: '#0f172a', display: 'block' }}>{itemName}</strong>
-              <span style={{ fontSize: '0.9rem', color: '#1e3a8a', fontFamily: 'monospace', fontWeight: 700 }}>{inventoryCode}</span>
+              <div style={{ fontSize: '0.9rem', color: '#1e3a8a', fontFamily: 'monospace', fontWeight: 700 }}>{inventoryCode}</div>
+              {item?.serialNumber && (
+                <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.2rem' }}>
+                  No. Seri: {item.serialNumber}
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>

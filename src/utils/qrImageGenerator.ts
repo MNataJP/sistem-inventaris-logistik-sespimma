@@ -161,7 +161,7 @@ export async function downloadSingleQRImage(
 
   // 6. Right Column: Inventory Metadata
   const infoX = qrBoxX + qrBoxW + 28;
-  let currentY = cardY + headerHeight + 36;
+  let currentY = cardY + headerHeight + 32;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
 
@@ -169,59 +169,72 @@ export async function downloadSingleQRImage(
   ctx.fillStyle = '#1e3a8a';
   ctx.font = 'bold 28px "Consolas", "Courier New", monospace';
   ctx.fillText(item.inventoryCode || '-', infoX, currentY);
-  currentY += 40;
+  currentY += 38;
 
   // Nama Barang
   ctx.fillStyle = '#0f172a';
-  ctx.font = 'bold 23px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'bold 22px "Segoe UI", Roboto, Arial, sans-serif';
   const nameLines = wrapText(ctx, item.name || '-', 470, 2);
   for (const line of nameLines) {
     ctx.fillText(line, infoX, currentY);
-    currentY += 30;
+    currentY += 28;
   }
-  currentY += 4;
+  currentY += 3;
 
   // Merk & Model
   if (item.brand || item.model) {
     ctx.fillStyle = '#475569';
-    ctx.font = '500 18px "Segoe UI", Roboto, Arial, sans-serif';
+    ctx.font = '500 17px "Segoe UI", Roboto, Arial, sans-serif';
     const brandText = `${item.brand || ''} ${item.model ? `(${item.model})` : ''}`.trim();
     ctx.fillText(brandText, infoX, currentY);
-    currentY += 30;
+    currentY += 26;
+  }
+
+  // No. Seri (Serial Number)
+  if (item.serialNumber) {
+    const snLabel = 'No. Seri: ';
+    ctx.font = 'normal 16.5px "Segoe UI", Roboto, Arial, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText(snLabel, infoX, currentY);
+    const snLabelWidth = ctx.measureText(snLabel).width;
+    ctx.font = 'bold 16.5px "Segoe UI", Roboto, Arial, sans-serif';
+    ctx.fillStyle = '#1e293b';
+    ctx.fillText(item.serialNumber, infoX + snLabelWidth, currentY);
+    currentY += 26;
   }
 
   // Kategori
   const catLabel = 'Kat: ';
-  ctx.font = 'normal 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'normal 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.fillStyle = '#64748b';
   ctx.fillText(catLabel, infoX, currentY);
   const catLabelWidth = ctx.measureText(catLabel).width;
-  ctx.font = 'bold 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'bold 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.fillStyle = '#1e293b';
   const catName = item.categoryNameSnapshot || item.categoryId || '-';
   ctx.fillText(catName, infoX + catLabelWidth, currentY);
-  currentY += 28;
+  currentY += 26;
 
   // Lokasi
   const locLabel = 'Lok: ';
-  ctx.font = 'normal 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'normal 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.fillStyle = '#64748b';
   ctx.fillText(locLabel, infoX, currentY);
   const locLabelWidth = ctx.measureText(locLabel).width;
-  ctx.font = 'bold 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'bold 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.fillStyle = '#1e293b';
-  const buildingText = item.building || 'Gedung Utama Sespimma';
+  const buildingText = item.building || 'Gedung Sespimma';
   const roomText = item.room ? ` (${item.room})` : '';
   ctx.fillText(`${buildingText}${roomText}`, infoX + locLabelWidth, currentY);
-  currentY += 28;
+  currentY += 26;
 
   // Kondisi
   const condLabel = 'Kondisi: ';
-  ctx.font = 'normal 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'normal 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.fillStyle = '#64748b';
   ctx.fillText(condLabel, infoX, currentY);
   const condLabelWidth = ctx.measureText(condLabel).width;
-  ctx.font = 'bold 17.5px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'bold 16.5px "Segoe UI", Roboto, Arial, sans-serif';
   if (item.condition === 'Baik') {
     ctx.fillStyle = '#15803d'; // Green
   } else if (item.condition === 'Rusak Ringan') {

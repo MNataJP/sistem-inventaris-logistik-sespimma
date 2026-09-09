@@ -726,8 +726,61 @@ export const ItemDetailPage: React.FC = () => {
                     </div>
 
                     <div style={{ marginTop: '0.875rem', paddingTop: '0.75rem', borderTop: '1px solid #e2e8f0', fontSize: '0.875rem' }}>
-                      <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>DESKRIPSI / SPESIFIKASI</span>
-                      <p style={{ marginTop: '0.25rem', color: '#334155' }}>{item.description || 'Tidak ada catatan deskripsi khusus.'}</p>
+                      <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginBottom: '0.25rem', fontWeight: 600 }}>DESKRIPSI / SPESIFIKASI</span>
+                      {(() => {
+                        if (!item.description || !item.description.trim()) {
+                          return (
+                            <p style={{ marginTop: '0.25rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                              Tidak ada catatan deskripsi khusus.
+                            </p>
+                          );
+                        }
+
+                        const lines = item.description
+                          .split(/\r?\n/)
+                          .map(line => line.trim())
+                          .filter(Boolean);
+
+                        if (lines.length === 0) {
+                          return (
+                            <p style={{ marginTop: '0.25rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                              Tidak ada catatan deskripsi khusus.
+                            </p>
+                          );
+                        }
+
+                        if (lines.length === 1 && !/^[•\-\*\d+\.]/.test(lines[0])) {
+                          return (
+                            <p style={{ marginTop: '0.25rem', color: '#334155', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                              {lines[0]}
+                            </p>
+                          );
+                        }
+
+                        return (
+                          <ul
+                            style={{
+                              marginTop: '0.35rem',
+                              marginBottom: '0.25rem',
+                              paddingLeft: '1.25rem',
+                              color: '#334155',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.35rem',
+                              listStyleType: 'disc'
+                            }}
+                          >
+                            {lines.map((line, idx) => {
+                              const cleanText = line.replace(/^[•\-\*]\s*/, '').replace(/^\d+[\.\)]\s*/, '');
+                              return (
+                                <li key={idx} style={{ lineHeight: 1.5, fontSize: '0.875rem' }}>
+                                  {cleanText || line}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}

@@ -173,7 +173,7 @@ export const QRPrintPage: React.FC = () => {
       >
         <Info size={20} style={{ flexShrink: 0 }} />
         <div>
-          <strong>Format Cetak Standar Kertas A4:</strong> File PDF akan diunduh dengan tata letak <strong>2 kolom per baris (1 baris 2 label)</strong> siap cetak pada kertas stiker / label A4 resmi Sespimma Polri.
+          <strong>Format Cetak Standar Kertas A4:</strong> File PDF akan diunduh dengan tata letak <strong>3 kolom per baris (1 baris 3 label)</strong> siap cetak pada kertas stiker / label A4 resmi Sespimma Polri.
         </div>
       </div>
 
@@ -284,12 +284,12 @@ export const QRPrintPage: React.FC = () => {
         )}
       </div>
 
-      {/* Live Preview Area (Template A4: 1 baris berisi 2 label) */}
+      {/* Live Preview Area (Template A4: 1 baris berisi 3 label) */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Sparkles size={18} color="#1e3a8a" />
-            <span>Pratinjau Tata Letak Label (1 Baris = 2 Label QR)</span>
+            <span>Pratinjau Tata Letak Label (1 Baris = 3 Label QR)</span>
           </h2>
           <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
             {selectedItems.length} label siap diunduh
@@ -308,8 +308,8 @@ export const QRPrintPage: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-              gap: '1.25rem',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: '1rem',
             }}
           >
             {selectedItems.map((item) => (
@@ -359,7 +359,7 @@ export const QRPrintPage: React.FC = () => {
                   >
                     <QRCodeSVG
                       value={item.qrUrl || `${window.location.origin}/item/${item.inventoryCode}`}
-                      size={100}
+                      size={95}
                       level="M"
                       includeMargin={false}
                     />
@@ -394,12 +394,17 @@ export const QRPrintPage: React.FC = () => {
                     <div style={{ fontFamily: 'monospace', fontWeight: 800, fontSize: '0.95rem', color: '#1e3a8a', marginBottom: '0.2rem' }}>
                       {item.inventoryCode}
                     </div>
-                    <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.875rem', lineHeight: 1.3, marginBottom: '0.35rem', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.85rem', lineHeight: 1.3, marginBottom: '0.3rem', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                       {item.name}
                     </div>
                     {item.brand && (
-                      <div style={{ color: '#475569', fontSize: '0.75rem', marginBottom: '0.2rem' }}>
+                      <div style={{ color: '#475569', fontSize: '0.75rem', marginBottom: '0.15rem' }}>
                         {item.brand} {item.model ? `(${item.model})` : ''}
+                      </div>
+                    )}
+                    {item.serialNumber && (
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.15rem' }}>
+                        No. Seri: <strong style={{ color: '#1e293b' }}>{item.serialNumber}</strong>
                       </div>
                     )}
                     <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.15rem' }}>

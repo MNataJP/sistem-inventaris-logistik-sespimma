@@ -4,7 +4,7 @@ import { createInventoryItem, getItemById, updateInventoryItem } from '@/service
 import { getCategories, getLocations } from '@/services/masterDataService';
 import { Category, Location, ItemCondition, ItemStatus } from '@/types/inventory';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Save, AlertCircle, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Upload, X, Image as ImageIcon, MapPin } from 'lucide-react';
 
 export const ItemFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,19 +27,27 @@ export const ItemFormPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchasePrice, setPurchasePrice] = useState<string>('');
-  const [fundingSource, setFundingSource] = useState('APBN 2026');
+  const [fundingSource, setFundingSource] = useState('');
   const [vendor, setVendor] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
   const [condition, setCondition] = useState<ItemCondition>('Baik');
   const [status, setStatus] = useState<ItemStatus>('Tersedia');
+  const [selectedLocationId, setSelectedLocationId] = useState('');
   const [building, setBuilding] = useState('');
-  const [floor, setFloor] = useState('1');
+  const [floor, setFloor] = useState('');
   const [room, setRoom] = useState('');
   const [locationDetail, setLocationDetail] = useState('');
+  const [isManualBuilding, setIsManualBuilding] = useState(false);
+  const [isManualRoom, setIsManualRoom] = useState(false);
   const [responsiblePersonName, setResponsiblePersonName] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [existingImageUrl, setExistingImageUrl] = useState('');
+
+  const uniqueBuildings = Array.from(new Set(locations.map(l => l.building).filter(Boolean)));
+  const availableRooms = building
+    ? Array.from(new Set(locations.filter(l => l.building.toLowerCase() === building.toLowerCase()).map(l => l.room).filter(Boolean)))
+    : [];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,10 +56,6 @@ export const ItemFormPage: React.FC = () => {
         const [cats, locs] = await Promise.all([getCategories(), getLocations()]);
         setCategories(cats);
         setLocations(locs);
-
-        if (cats.length > 0 && !categoryId) {
-          setCategoryId(cats[0].id);
-        }
 
         if (isEdit && id) {
           const item = await getItemById(id);
@@ -66,17 +70,28 @@ export const ItemFormPage: React.FC = () => {
             setPurchasePrice(
               item.purchasePrice ? new Intl.NumberFormat('id-ID').format(item.purchasePrice) : ''
             );
-            setFundingSource(item.fundingSource || 'APBN 2026');
+            setFundingSource(item.fundingSource || '');
             setVendor(item.vendor || '');
             setDocumentNumber(item.documentNumber || '');
             setCondition(item.condition || 'Baik');
             setStatus(item.status || 'Tersedia');
             setBuilding(item.building || '');
-            setFloor(item.floor || '1');
+            setFloor(item.floor || '');
             setRoom(item.room || '');
             setLocationDetail(item.locationDetail || '');
             setResponsiblePersonName(item.responsiblePersonNameSnapshot || '');
             setExistingImageUrl(item.imageUrl || '');
+
+            // Match master location if exists
+            if (item.building && item.room) {
+              const matchedLoc = locs.find(
+                l => l.building.toLowerCase() === (item.building || '').toLowerCase() &&
+                     l.room.toLowerCase() === (item.room || '').toLowerCase()
+              );
+              if (matchedLoc) {
+                setSelectedLocationId(matchedLoc.id);
+              }
+            }
           }
         }
       } catch (err) {
@@ -87,6 +102,66 @@ export const ItemFormPage: React.FC = () => {
     };
     fetchData();
   }, [id, isEdit]);
+
+  // Handler when user selects Master Location from quick dropdown
+  const handleMasterLocationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const locId = e.target.value;
+    setSelectedLocationId(locId);
+    if (!locId) return;
+
+    const loc = locations.find(l => l.id === locId);
+    if (loc) {
+      setBuilding(loc.building);
+      setFloor(loc.floor || '');
+      setRoom(loc.room || '');
+      setLocationDetail(loc.detail || '');
+      setIsManualBuilding(false);
+      setIsManualRoom(false);
+    }
+  };
+
+  // Handler when user selects Building from dropdown
+  const handleBuildingSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === '__manual__') {
+      setIsManualBuilding(true);
+      setBuilding('');
+      setRoom('');
+      setSelectedLocationId('');
+    } else {
+      setIsManualBuilding(false);
+      setBuilding(val);
+      const matchingRooms = locations.filter(l => l.building === val);
+      if (matchingRooms.length === 1) {
+        setRoom(matchingRooms[0].room);
+        setFloor(matchingRooms[0].floor || '');
+        setLocationDetail(matchingRooms[0].detail || '');
+        setSelectedLocationId(matchingRooms[0].id);
+      } else {
+        setRoom('');
+        setSelectedLocationId('');
+      }
+    }
+  };
+
+  // Handler when user selects Room from dropdown
+  const handleRoomSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === '__manual__') {
+      setIsManualRoom(true);
+      setRoom('');
+      setSelectedLocationId('');
+    } else {
+      setIsManualRoom(false);
+      setRoom(val);
+      const match = locations.find(l => l.building === building && l.room === val);
+      if (match) {
+        if (match.floor) setFloor(match.floor);
+        if (match.detail) setLocationDetail(match.detail);
+        setSelectedLocationId(match.id);
+      }
+    }
+  };
 
   // Handle formatted numeric price input (only digits, formatted with thousand separators)
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,6 +292,7 @@ export const ItemFormPage: React.FC = () => {
               <div className="form-group">
                 <label className="form-label">Kategori *</label>
                 <select required className="form-select" value={categoryId} onChange={e => setCategoryId(e.target.value)}>
+                  <option value="">-- Pilih Kategori --</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
@@ -225,28 +301,37 @@ export const ItemFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Merk / Brand</label>
-                <input type="text" className="form-input" placeholder="Dell, Samsung, Yamaha, dll" value={brand} onChange={e => setBrand(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Contoh: Dell, Samsung, Yamaha, dll" value={brand} onChange={e => setBrand(e.target.value)} />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Tipe / Model</label>
-                <input type="text" className="form-input" placeholder="Latitude 5420" value={model} onChange={e => setModel(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Contoh: Latitude 5420" value={model} onChange={e => setModel(e.target.value)} />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Nomor Seri Pabrik (S/N)</label>
-                <input type="text" className="form-input" placeholder="SN123456789" value={serialNumber} onChange={e => setSerialNumber(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Contoh: SN123456789" value={serialNumber} onChange={e => setSerialNumber(e.target.value)} />
               </div>
             </div>
 
             <div className="form-group">
               <label className="form-label">Penanggung Jawab / Pengguna Aset</label>
-              <input type="text" className="form-input" placeholder="Nama Petugas / Pamen / Bintara" value={responsiblePersonName} onChange={e => setResponsiblePersonName(e.target.value)} />
+              <input type="text" className="form-input" placeholder="Contoh: Nama Petugas / Pamen / Bintara" value={responsiblePersonName} onChange={e => setResponsiblePersonName(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label className="form-label">Deskripsi & Spesifikasi Detail</label>
-              <textarea className="form-textarea" rows={3} placeholder="Penjelasan rincian spesifikasi teknis barang..." value={description} onChange={e => setDescription(e.target.value)} />
+              <textarea
+                className="form-textarea"
+                rows={4}
+                placeholder={`Contoh spesifikasi (tekan ENTER untuk membuat poin baru):\n• Intel Core i7-1165G7\n• RAM 16GB DDR4\n• SSD 512GB NVMe\n• Garansi Resmi 1 Tahun`}
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem', display: 'block' }}>
+                💡 <strong>Petunjuk:</strong> Tekan ENTER untuk memisahkan setiap poin spesifikasi. Sistem akan otomatis menampilkannya sebagai daftar poin (bullet points) yang rapi di halaman detail barang.
+              </span>
             </div>
           </div>
 
@@ -255,6 +340,45 @@ export const ItemFormPage: React.FC = () => {
             <h3 style={{ fontSize: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', color: '#1e3a8a' }}>
               2. Kondisi, Status & Penempatan Lokasi
             </h3>
+
+            {/* Pilihan Cepat: Master Lokasi & Gedung */}
+            {locations.length > 0 && (
+              <div
+                style={{
+                  backgroundColor: '#f0f9ff',
+                  padding: '0.875rem 1rem',
+                  borderRadius: '10px',
+                  border: '1px solid #bae6fd',
+                  marginBottom: '1.25rem'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0369a1', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <MapPin size={16} color="#0284c7" />
+                    <span>Pilih dari Master Lokasi & Gedung:</span>
+                  </label>
+                  <Link to="/locations" target="_blank" style={{ fontSize: '0.75rem', color: '#0284c7', textDecoration: 'underline' }}>
+                    + Kelola Master Lokasi
+                  </Link>
+                </div>
+                <select
+                  className="form-select"
+                  value={selectedLocationId}
+                  onChange={handleMasterLocationChange}
+                  style={{ backgroundColor: '#ffffff', borderColor: '#7dd3fc', fontSize: '0.9rem', fontWeight: 500 }}
+                >
+                  <option value="">-- Pilih dari Daftar Master Lokasi & Gedung --</option>
+                  {locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.building} • {loc.room} (Lantai {loc.floor}){loc.detail ? ` - ${loc.detail}` : ''}
+                    </option>
+                  ))}
+                </select>
+                <span style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '0.35rem', display: 'block' }}>
+                  Memilih lokasi dari master data akan otomatis mengisi form Gedung, Lantai, Ruangan, dan Detail tanpa perlu mengetik manual.
+                </span>
+              </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.875rem' }}>
               <div className="form-group">
@@ -276,24 +400,106 @@ export const ItemFormPage: React.FC = () => {
                 </select>
               </div>
 
+              {/* Gedung / Bangunan */}
               <div className="form-group">
                 <label className="form-label">Gedung / Bangunan</label>
-                <input type="text" className="form-input" placeholder="Gedung Utama / Gadik" value={building} onChange={e => setBuilding(e.target.value)} />
+                {uniqueBuildings.length > 0 && !isManualBuilding ? (
+                  <div>
+                    <select
+                      className="form-select"
+                      value={uniqueBuildings.includes(building) ? building : ''}
+                      onChange={handleBuildingSelect}
+                    >
+                      <option value="">-- Pilih Gedung --</option>
+                      {uniqueBuildings.map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                      <option value="__manual__">+ Ketik Nama Gedung Manual...</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Contoh: Gedung Tribrata / Gadik"
+                      value={building}
+                      onChange={e => setBuilding(e.target.value)}
+                    />
+                    {uniqueBuildings.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsManualBuilding(false)}
+                        style={{ background: 'none', border: 'none', color: '#1e3a8a', fontSize: '0.75rem', cursor: 'pointer', padding: '0.2rem 0', textDecoration: 'underline' }}
+                      >
+                        Pilih dari dropdown master gedung
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Lantai</label>
-                <input type="text" className="form-input" placeholder="Lantai 1 / 2" value={floor} onChange={e => setFloor(e.target.value)} />
-              </div>
-
+              {/* Ruangan */}
               <div className="form-group">
                 <label className="form-label">Ruangan</label>
-                <input type="text" className="form-input" placeholder="Ruang Kelas A / R. Simulasi" value={room} onChange={e => setRoom(e.target.value)} />
+                {availableRooms.length > 0 && !isManualRoom ? (
+                  <div>
+                    <select
+                      className="form-select"
+                      value={availableRooms.includes(room) ? room : ''}
+                      onChange={handleRoomSelect}
+                    >
+                      <option value="">-- Pilih Ruangan --</option>
+                      {availableRooms.map(r => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                      <option value="__manual__">+ Ketik Nama Ruangan Manual...</option>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Contoh: Subbag Renmin / Kelas A"
+                      value={room}
+                      onChange={e => setRoom(e.target.value)}
+                    />
+                    {availableRooms.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsManualRoom(false)}
+                        style={{ background: 'none', border: 'none', color: '#1e3a8a', fontSize: '0.75rem', cursor: 'pointer', padding: '0.2rem 0', textDecoration: 'underline' }}
+                      >
+                        Pilih dari dropdown master ruangan
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
+              {/* Lantai */}
+              <div className="form-group">
+                <label className="form-label">Lantai</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: 1, 2, dll"
+                  value={floor}
+                  onChange={e => setFloor(e.target.value)}
+                />
+              </div>
+
+              {/* Detail Posisi Lokasi */}
               <div className="form-group">
                 <label className="form-label">Detail Posisi Lokasi</label>
-                <input type="text" className="form-input" placeholder="Meja 02 / Rak A3" value={locationDetail} onChange={e => setLocationDetail(e.target.value)} />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: Meja 02 / Rak A3"
+                  value={locationDetail}
+                  onChange={e => setLocationDetail(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -340,12 +546,24 @@ export const ItemFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Sumber Dana</label>
-                <input type="text" className="form-input" placeholder="APBN 2026 / Hibah" value={fundingSource} onChange={e => setFundingSource(e.target.value)} />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: APBN 2026 / PNBP / Hibah"
+                  value={fundingSource}
+                  onChange={e => setFundingSource(e.target.value)}
+                />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Vendor / Penyedia</label>
-                <input type="text" className="form-input" placeholder="PT. Logistik Utama" value={vendor} onChange={e => setVendor(e.target.value)} />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Contoh: PT. Logistik Utama"
+                  value={vendor}
+                  onChange={e => setVendor(e.target.value)}
+                />
               </div>
             </div>
           </div>
