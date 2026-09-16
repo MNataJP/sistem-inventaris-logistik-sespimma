@@ -233,7 +233,7 @@ export const BorrowingPage: React.FC = () => {
               type="text"
               className="form-input"
               style={{ paddingLeft: '2.25rem' }}
-              placeholder="Cari barang, kode, nama peminjam, atau instansi..."
+              placeholder="Masukkan nama barang, kode inventaris, nama peminjam, atau instansi..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
@@ -590,7 +590,7 @@ export const BorrowingPage: React.FC = () => {
                 <textarea
                   className="form-textarea"
                   rows={2}
-                  placeholder="Contoh: Dikembalikan dalam keadaan baik, lengkap bersama charger & kabel..."
+                  placeholder="Masukkan catatan kondisi barang saat dikembalikan..."
                   value={returnNotes}
                   onChange={e => setReturnNotes(e.target.value)}
                 />

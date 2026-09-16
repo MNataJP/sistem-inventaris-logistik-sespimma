@@ -64,8 +64,8 @@ export async function generateQRLabelsPDF(items: InventoryItem[], filename = 'La
     // Teks Header
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.0);
-    doc.text('SESPIMMA LEMDIKLAT POLRI', x + 2, y + 3.6);
+    doc.setFontSize(4.8);
+    doc.text('SIAP-LOG SESPIMMA POLRI', x + 2, y + 3.6);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(4.0);

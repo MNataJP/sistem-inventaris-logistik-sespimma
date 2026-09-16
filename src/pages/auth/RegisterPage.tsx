@@ -180,34 +180,24 @@ export const RegisterPage: React.FC = () => {
           </div>
         ) : (
           <>
-            <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-              <div
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <img
+                src="/logo.png"
+                alt="SIAP-LOG Sespimma Lemdiklat Polri"
                 style={{
-                  width: '72px',
-                  height: '72px',
-                  borderRadius: '16px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '0.75rem',
-                  backgroundColor: '#ffffff',
-                  padding: '5px',
-                  boxShadow: '0 8px 16px -3px rgba(30, 58, 138, 0.2)',
-                  border: '1px solid #e2e8f0'
+                  width: '100%',
+                  maxWidth: '210px',
+                  height: 'auto',
+                  maxHeight: '210px',
+                  objectFit: 'contain',
+                  margin: '0 auto 0.75rem',
+                  display: 'block',
+                  filter: 'drop-shadow(0 10px 15px rgba(30, 58, 138, 0.15))'
                 }}
-              >
-                <img
-                  src="/logo.png"
-                  alt="Logo Sespimma Lemdiklat Polri"
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                />
-              </div>
-              <h1 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '0.25rem' }}>
+              />
+              <h2 style={{ fontSize: '1.35rem', color: '#0f172a', margin: 0, fontWeight: 700 }}>
                 Daftar Akun Baru
-              </h1>
-              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                Sistem Inventaris Logistik Sespimma Lemdiklat Polri
-              </p>
+              </h2>
             </div>
 
             {error && (
@@ -239,7 +229,7 @@ export const RegisterPage: React.FC = () => {
                     required
                     className="form-input"
                     style={{ paddingLeft: '2.5rem' }}
-                    placeholder="Contoh: Bripka Ahmad Hidayat, S.H."
+                    placeholder="Masukkan nama lengkap & pangkat / gelar Anda..."
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
                   />
@@ -256,7 +246,7 @@ export const RegisterPage: React.FC = () => {
                       required
                       className="form-input"
                       style={{ paddingLeft: '2.5rem' }}
-                      placeholder="89012345"
+                      placeholder="Masukkan NRP / NIP / NIK Anda..."
                       value={nrp}
                       onChange={e => setNrp(e.target.value)}
                     />
@@ -272,7 +262,7 @@ export const RegisterPage: React.FC = () => {
                       required
                       className="form-input"
                       style={{ paddingLeft: '2.5rem' }}
-                      placeholder="Bag Sarpras / Gadik"
+                      placeholder="Masukkan unit / bagian Anda..."
                       value={unit}
                       onChange={e => setUnit(e.target.value)}
                     />
@@ -289,7 +279,7 @@ export const RegisterPage: React.FC = () => {
                     required
                     className="form-input"
                     style={{ paddingLeft: '2.5rem' }}
-                    placeholder="nama.user@polri.go.id"
+                    placeholder="Masukkan alamat email dinas / utama Anda..."
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                   />
@@ -318,7 +308,7 @@ export const RegisterPage: React.FC = () => {
                       required
                       className="form-input"
                       style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
-                      placeholder="••••••••"
+                      placeholder="Masukkan kata sandi baru Anda..."
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                     />
@@ -355,7 +345,7 @@ export const RegisterPage: React.FC = () => {
                       required
                       className="form-input"
                       style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
-                      placeholder="••••••••"
+                      placeholder="Masukkan ulang kata sandi Anda..."
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
                     />
@@ -406,9 +396,8 @@ export const RegisterPage: React.FC = () => {
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.25rem' }}>
-            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
-          </div>
+          <div style={{ marginTop: '0.25rem' }}>Created by M Nata Jayndra Permana</div>
+          <div>Email: <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a></div>
         </div>
       </div>
     </div>

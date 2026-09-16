@@ -112,34 +112,21 @@ export const LoginPage: React.FC = () => {
           backgroundColor: '#ffffff'
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <img
+            src="/logo.png"
+            alt="SIAP-LOG Sespimma Lemdiklat Polri"
             style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '20px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '1rem',
-              backgroundColor: '#ffffff',
-              padding: '6px',
-              boxShadow: '0 8px 20px -4px rgba(30, 58, 138, 0.25)',
-              border: '1px solid #e2e8f0'
+              width: '100%',
+              maxWidth: '230px',
+              height: 'auto',
+              maxHeight: '230px',
+              objectFit: 'contain',
+              margin: '0 auto',
+              display: 'block',
+              filter: 'drop-shadow(0 10px 15px rgba(30, 58, 138, 0.15))'
             }}
-          >
-            <img
-              src="/logo.png"
-              alt="Logo Sespimma Lemdiklat Polri"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          </div>
-          <h1 style={{ fontSize: '1.5rem', color: '#0f172a', marginBottom: '0.25rem' }}>
-            Sistem Inventaris Logistik
-          </h1>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: 500 }}>
-            Sespimma Lemdiklat Polri
-          </p>
+          />
         </div>
 
         {error && (
@@ -172,7 +159,7 @@ export const LoginPage: React.FC = () => {
                 required
                 className="form-input"
                 style={{ paddingLeft: '2.5rem' }}
-                placeholder="admin@polri.go.id"
+                placeholder="Masukkan alamat email Anda..."
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
@@ -189,7 +176,7 @@ export const LoginPage: React.FC = () => {
                 required
                 className="form-input"
                 style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
-                placeholder="••••••••"
+                placeholder="Masukkan kata sandi Anda..."
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
@@ -244,9 +231,8 @@ export const LoginPage: React.FC = () => {
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.25rem' }}>
-            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
-          </div>
+          <div style={{ marginTop: '0.25rem' }}>Created by M Nata Jayndra Permana</div>
+          <div>Email: <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a></div>
         </div>
       </div>
     </div>

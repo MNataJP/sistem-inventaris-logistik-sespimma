@@ -44,27 +44,20 @@ export const ForgotPasswordPage: React.FC = () => {
         </Link>
 
         <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-          <div
+          <img
+            src="/logo.png"
+            alt="SIAP-LOG Sespimma Lemdiklat Polri"
             style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '16px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '0.75rem',
-              backgroundColor: '#ffffff',
-              padding: '4px',
-              boxShadow: '0 6px 14px -3px rgba(30, 58, 138, 0.2)',
-              border: '1px solid #e2e8f0'
+              width: '100%',
+              maxWidth: '190px',
+              height: 'auto',
+              maxHeight: '190px',
+              objectFit: 'contain',
+              margin: '0 auto',
+              display: 'block',
+              filter: 'drop-shadow(0 10px 15px rgba(30, 58, 138, 0.15))'
             }}
-          >
-            <img
-              src="/logo.png"
-              alt="Logo Sespimma Lemdiklat Polri"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          </div>
+          />
         </div>
 
         <h2 style={{ fontSize: '1.35rem', marginBottom: '0.5rem' }}>Lupa Kata Sandi</h2>
@@ -97,7 +90,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   required
                   className="form-input"
                   style={{ paddingLeft: '2.5rem' }}
-                  placeholder="admin@polri.go.id"
+                  placeholder="Masukkan alamat email terdaftar Anda..."
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
@@ -113,9 +106,8 @@ export const ForgotPasswordPage: React.FC = () => {
 
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', lineHeight: 1.6 }}>
           <div>Hak Cipta © 2026 Sespimma Lemdiklat Polri. All rights reserved.</div>
-          <div style={{ marginTop: '0.25rem' }}>
-            Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
-          </div>
+          <div style={{ marginTop: '0.25rem' }}>Created by M Nata Jayndra Permana</div>
+          <div>Email: <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a></div>
         </div>
       </div>
     </div>

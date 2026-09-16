@@ -408,7 +408,7 @@ export const UserListPage: React.FC = () => {
               type="text"
               className="form-input"
               style={{ paddingLeft: '2.4rem' }}
-              placeholder="Cari nama, NRP, email, unit..."
+              placeholder="Masukkan nama, NRP, email, atau unit pengguna..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -906,7 +906,7 @@ export const UserListPage: React.FC = () => {
                   className="form-textarea"
                   rows={3}
                   required
-                  placeholder="Contoh: NRP tidak terdaftar dalam database personel aktif Sespimma Polri / Data unit tidak valid."
+                  placeholder="Masukkan alasan penolakan pendaftaran akun..."
                   value={rejectionReason}
                   onChange={e => setRejectionReason(e.target.value)}
                 />

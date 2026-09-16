@@ -174,7 +174,7 @@ export const CategoryListPage: React.FC = () => {
             type="text"
             className="form-input"
             style={{ paddingLeft: '2.4rem' }}
-            placeholder="Cari kategori barang..."
+            placeholder="Masukkan nama atau deskripsi kategori barang..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
@@ -314,7 +314,7 @@ export const CategoryListPage: React.FC = () => {
                   type="text"
                   required
                   className="form-input"
-                  placeholder="Elektronik & TI, Kendaraan Dinas, Senjata..."
+                  placeholder="Masukkan nama kategori..."
                   value={name}
                   onChange={e => setName(e.target.value)}
                 />
@@ -325,7 +325,7 @@ export const CategoryListPage: React.FC = () => {
                 <textarea
                   className="form-textarea"
                   rows={3}
-                  placeholder="Contoh: Laptop, Komputer Desktop, Printer, Scanner, Projector"
+                  placeholder="Masukkan deskripsi & rincian jenis..."
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                 />

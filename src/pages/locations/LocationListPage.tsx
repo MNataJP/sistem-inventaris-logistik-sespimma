@@ -183,7 +183,7 @@ export const LocationListPage: React.FC = () => {
             type="text"
             className="form-input"
             style={{ paddingLeft: '2.4rem' }}
-            placeholder="Cari gedung, ruangan, lantai..."
+            placeholder="Masukkan nama gedung, ruangan, atau lantai..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
@@ -334,7 +334,7 @@ export const LocationListPage: React.FC = () => {
                   type="text"
                   required
                   className="form-input"
-                  placeholder="Gedung Utama, Gedung Gadik A, Garasi..."
+                  placeholder="Masukkan nama gedung / bangunan..."
                   value={building}
                   onChange={e => setBuilding(e.target.value)}
                 />
@@ -347,7 +347,7 @@ export const LocationListPage: React.FC = () => {
                     type="text"
                     required
                     className="form-input"
-                    placeholder="1, 2, 3..."
+                    placeholder="Masukkan nomor lantai..."
                     value={floor}
                     onChange={e => setFloor(e.target.value)}
                   />
@@ -359,7 +359,7 @@ export const LocationListPage: React.FC = () => {
                     type="text"
                     required
                     className="form-input"
-                    placeholder="Ruang Logistik & Sarpras..."
+                    placeholder="Masukkan nama ruangan..."
                     value={room}
                     onChange={e => setRoom(e.target.value)}
                   />
@@ -371,7 +371,7 @@ export const LocationListPage: React.FC = () => {
                 <textarea
                   className="form-textarea"
                   rows={2}
-                  placeholder="Contoh: Meja Admin 01, Rak Komputer 03, Slot Parkir..."
+                  placeholder="Masukkan keterangan / detail penempatan..."
                   value={detail}
                   onChange={e => setDetail(e.target.value)}
                 />

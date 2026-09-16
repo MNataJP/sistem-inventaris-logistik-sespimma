@@ -318,11 +318,11 @@ export const ItemDetailPage: React.FC = () => {
               style={{ width: '36px', height: '36px', objectFit: 'contain' }}
             />
             <div>
-              <h1 style={{ fontSize: '1rem', color: '#0f172a', lineHeight: 1.2, margin: 0 }}>
-                Sistem Inventaris Logistik
+              <h1 style={{ fontSize: '1.05rem', color: '#0f172a', lineHeight: 1.2, margin: 0, fontWeight: 800 }}>
+                SIAP-LOG
               </h1>
-              <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, fontWeight: 500 }}>
-                Sespimma Lemdiklat Polri
+              <p style={{ fontSize: '0.75rem', color: '#1e3a8a', margin: 0, fontWeight: 700 }}>
+                (SISTEM INVENTARIS ASET DAN PERALATAN LOGISTIK) SESPIMMA LEMDIKLAT POLRI
               </p>
             </div>
           </div>
@@ -461,7 +461,7 @@ export const ItemDetailPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <QrCode size={18} color="#1e3a8a" />
                 <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1e3a8a' }}>
-                  Detail Inventaris Logistik
+                  SIAP-LOG Sespimma Lemdiklat Polri
                 </span>
               </div>
               <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1e3a8a', fontFamily: 'monospace' }}>
@@ -884,7 +884,7 @@ export const ItemDetailPage: React.FC = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Teknisi / Pelaksana</label>
-                <input type="text" className="form-input" value={maintTech} onChange={e => setMaintTech(e.target.value)} placeholder="Nama Petugas / Teknisi" />
+                <input type="text" className="form-input" value={maintTech} onChange={e => setMaintTech(e.target.value)} placeholder="Masukkan nama petugas / teknisi pelaksana..." />
               </div>
               <div className="form-group">
                 <label className="form-label">Biaya Pemeliharaan (IDR)</label>
@@ -907,7 +907,7 @@ export const ItemDetailPage: React.FC = () => {
                     inputMode="numeric"
                     className="form-input"
                     style={{ paddingLeft: '2.5rem' }}
-                    placeholder="Contoh: 150.000 (Kosongkan jika gratis)"
+                    placeholder="Masukkan biaya pemeliharaan (kosongkan jika gratis)..."
                     value={maintCostRaw ? Number(maintCostRaw).toLocaleString('id-ID') : ''}
                     onChange={handleMaintCostChange}
                   />
@@ -979,7 +979,7 @@ export const ItemDetailPage: React.FC = () => {
                   type="text"
                   required
                   className="form-input"
-                  placeholder="Masukkan nama lengkap peminjam"
+                  placeholder="Masukkan nama lengkap peminjam..."
                   value={borrowerName}
                   onChange={e => setBorrowerName(e.target.value)}
                 />
@@ -994,7 +994,7 @@ export const ItemDetailPage: React.FC = () => {
                   type="text"
                   required
                   className="form-input"
-                  placeholder="Contoh: Bagian Logistik / Pokjar IV / Korps Siswa..."
+                  placeholder="Masukkan instansi / unit kerja peminjam..."
                   value={borrowerInstitution}
                   onChange={e => setBorrowerInstitution(e.target.value)}
                 />
@@ -1039,7 +1039,7 @@ export const ItemDetailPage: React.FC = () => {
                   required
                   className="form-textarea"
                   rows={3}
-                  placeholder="Jelaskan keperluan peminjaman / kegiatan / tugas kedinasan operasional..."
+                  placeholder="Masukkan keperluan peminjaman / kegiatan / tugas kedinasan..."
                   value={borrowPurpose}
                   onChange={e => setBorrowPurpose(e.target.value)}
                 />
@@ -1070,10 +1070,9 @@ export const ItemDetailPage: React.FC = () => {
 
       {/* Official Sespimma Polri Footer */}
       <footer style={{ padding: '1rem 1.5rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', backgroundColor: '#ffffff', marginTop: 'auto', lineHeight: 1.6 }}>
-        <div>Hak Cipta © 2026 Sistem Inventaris Logistik - Sespimma Lemdiklat Polri. All rights reserved.</div>
-        <div style={{ marginTop: '0.25rem' }}>
-          Created by M Nata Jayndra Permana &bull; Email : <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a>
-        </div>
+        <div>Hak Cipta © 2026 SIAP-LOG (SISTEM INVENTARIS ASET DAN PERALATAN LOGISTIK) SESPIMMA LEMDIKLAT POLRI. All rights reserved.</div>
+        <div style={{ marginTop: '0.25rem' }}>Created by M Nata Jayndra Permana</div>
+        <div>Email: <a href="mailto:natajp81@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>natajp81@gmail.com</a></div>
       </footer>
 
       <style>{`

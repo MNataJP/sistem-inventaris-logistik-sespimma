@@ -138,7 +138,7 @@ export const ItemListPage: React.FC = () => {
                 type="text"
                 className="form-input"
                 style={{ paddingLeft: '2.25rem' }}
-                placeholder="INV-2026..., laptop, dell..."
+                placeholder="Masukkan kode inventaris, nama, merk, atau lokasi barang..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />

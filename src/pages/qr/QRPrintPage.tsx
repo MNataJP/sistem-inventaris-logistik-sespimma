@@ -205,7 +205,7 @@ export const QRPrintPage: React.FC = () => {
               type="text"
               className="form-input"
               style={{ paddingLeft: '2.25rem' }}
-              placeholder="Cari kode, nama barang, merk..."
+              placeholder="Masukkan kode inventaris, nama barang, atau merk..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
@@ -338,7 +338,7 @@ export const QRPrintPage: React.FC = () => {
                     letterSpacing: '0.5px'
                   }}
                 >
-                  <span>SESPIMMA LEMDIKLAT POLRI</span>
+                  <span>SIAP-LOG SESPIMMA POLRI</span>
                   <span style={{ fontSize: '0.65rem', opacity: 0.85, fontWeight: 500 }}>ASET LOGISTIK</span>
                 </div>
 

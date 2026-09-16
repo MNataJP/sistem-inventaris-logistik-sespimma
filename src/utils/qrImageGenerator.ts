@@ -119,12 +119,12 @@ export async function downloadSingleQRImage(
   ctx.fillStyle = '#1e3a8a';
   ctx.fillRect(cardX, cardY, cardW, headerHeight);
 
-  // Header Left: "SESPIMMA LEMDIKLAT POLRI"
+  // Header Left: "SIAP-LOG SESPIMMA LEMDIKLAT POLRI"
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 20px "Segoe UI", Roboto, Arial, sans-serif';
+  ctx.font = 'bold 19px "Segoe UI", Roboto, Arial, sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText('SESPIMMA LEMDIKLAT POLRI', cardX + 24, cardY + headerHeight / 2);
+  ctx.fillText('SIAP-LOG SESPIMMA LEMDIKLAT POLRI', cardX + 24, cardY + headerHeight / 2);
 
   // Header Right: "ASET LOGISTIK"
   ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';

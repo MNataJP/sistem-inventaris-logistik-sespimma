@@ -33,11 +33,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           <Menu size={20} />
         </button>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <h2 style={{ fontSize: 'clamp(0.95rem, 2vw, 1.125rem)', margin: 0, color: '#1e3a8a', lineHeight: 1.2, fontWeight: 700 }}>
-            LOGISTIK SESPIMMA
+          <h2 style={{ fontSize: 'clamp(0.95rem, 2vw, 1.125rem)', margin: 0, color: '#1e3a8a', lineHeight: 1.2, fontWeight: 800 }}>
+            SIAP-LOG
           </h2>
           <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
-            LEMDIKLAT POLRI
+            SESPIMMA LEMDIKLAT POLRI
           </span>
         </div>
       </div>

@@ -102,8 +102,8 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               No. Seri: {item.serialNumber}
             </div>
           )}
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-            SESPIMMA LEMDIKLAT POLRI
+          <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '0.2rem', fontWeight: 600 }}>
+            SIAP-LOG SESPIMMA LEMDIKLAT POLRI
           </div>
         </div>
 

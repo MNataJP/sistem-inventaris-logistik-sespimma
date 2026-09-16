@@ -24,13 +24,13 @@ export async function sendApprovalEmail(
   approvedBy: string
 ): Promise<EmailNotificationResult> {
   const loginUrl = `${window.location.origin}/login`;
-  const subject = `[DISETUJUI] Pendaftaran Akun Sistem Inventaris Logistik Sespimma Polri`;
+  const subject = `[DISETUJUI] Pendaftaran Akun SIAP-LOG Sespimma Lemdiklat Polri`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; background-color: #ffffff;">
       <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #1e3a8a;">
-        <h2 style="color: #1e3a8a; margin: 0;">SISTEM INVENTARIS LOGISTIK</h2>
-        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Sespimma Lemdiklat Polri</p>
+        <h2 style="color: #1e3a8a; margin: 0; font-weight: 800;">SIAP-LOG</h2>
+        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 13px; font-weight: 600;">SISTEM INVENTARIS ASET DAN PERALATAN LOGISTIK SESPIMMA LEMDIKLAT POLRI</p>
       </div>
 
       <div style="padding: 25px 0;">
@@ -39,7 +39,7 @@ export async function sendApprovalEmail(
           Yth. <strong>${user.name}</strong>,
         </p>
         <p style="color: #334155; font-size: 15px; line-height: 1.6;">
-          Pendaftaran akun Anda pada Sistem Inventaris Logistik Sespimma Lemdiklat Polri telah <strong>DISETUJUI</strong> oleh Administrator (<strong>${approvedBy}</strong>).
+          Pendaftaran akun Anda pada SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri telah <strong>DISETUJUI</strong> oleh Administrator (<strong>${approvedBy}</strong>).
         </p>
 
         <div style="background-color: #f8fafc; border-left: 4px solid #1e3a8a; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -60,13 +60,13 @@ export async function sendApprovalEmail(
       </div>
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; color: #94a3b8; font-size: 12px;">
-        <p style="margin: 0;">Email ini dikirim secara otomatis oleh Sistem Inventaris Logistik Sespimma Lemdiklat Polri.</p>
+        <p style="margin: 0;">Email ini dikirim secara otomatis oleh SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri.</p>
         <p style="margin: 5px 0 0 0;">© 2026 Sespimma Lemdiklat Polri. All rights reserved.</p>
       </div>
     </div>
   `;
 
-  const textContent = `Yth. ${user.name},\n\nPendaftaran akun Anda (${user.email}) pada Sistem Inventaris Logistik Sespimma Lemdiklat Polri telah DISETUJUI oleh Administrator (${approvedBy}).\n\nSilakan login melalui: ${loginUrl}\n\nSespimma Lemdiklat Polri.`;
+  const textContent = `Yth. ${user.name},\n\nPendaftaran akun Anda (${user.email}) pada SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri telah DISETUJUI oleh Administrator (${approvedBy}).\n\nSilakan login melalui: ${loginUrl}\n\nSespimma Lemdiklat Polri.`;
 
   try {
     // Simpan ke Firestore collection 'mail' (terintegrasi dengan ekstensi Firebase Trigger Email)
@@ -112,13 +112,13 @@ export async function sendRejectionEmail(
   rejectionReason: string,
   rejectedBy: string
 ): Promise<EmailNotificationResult> {
-  const subject = `[PEMBERITAHUAN] Status Pendaftaran Akun Sistem Logistik Sespimma Polri`;
+  const subject = `[PEMBERITAHUAN] Status Pendaftaran Akun SIAP-LOG Sespimma Lemdiklat Polri`;
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; background-color: #ffffff;">
       <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #b91c1c;">
-        <h2 style="color: #1e3a8a; margin: 0;">SISTEM INVENTARIS LOGISTIK</h2>
-        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Sespimma Lemdiklat Polri</p>
+        <h2 style="color: #1e3a8a; margin: 0; font-weight: 800;">SIAP-LOG</h2>
+        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 13px; font-weight: 600;">SISTEM INVENTARIS ASET DAN PERALATAN LOGISTIK SESPIMMA LEMDIKLAT POLRI</p>
       </div>
 
       <div style="padding: 25px 0;">
@@ -127,7 +127,7 @@ export async function sendRejectionEmail(
           Yth. <strong>${user.name}</strong>,
         </p>
         <p style="color: #334155; font-size: 15px; line-height: 1.6;">
-          Mohon maaf, permohonan pendaftaran akun Anda untuk email <strong>${user.email}</strong> pada Sistem Inventaris Logistik Sespimma Lemdiklat Polri <strong>TIDAK DAPAT DISETUJUI</strong> oleh Administrator (<strong>${rejectedBy}</strong>).
+          Mohon maaf, permohonan pendaftaran akun Anda untuk email <strong>${user.email}</strong> pada SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri <strong>TIDAK DAPAT DISETUJUI</strong> oleh Administrator (<strong>${rejectedBy}</strong>).
         </p>
 
         <div style="background-color: #fef2f2; border-left: 4px solid #b91c1c; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -143,13 +143,13 @@ export async function sendRejectionEmail(
       </div>
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; color: #94a3b8; font-size: 12px;">
-        <p style="margin: 0;">Email ini dikirim secara otomatis oleh Sistem Inventaris Logistik Sespimma Lemdiklat Polri.</p>
+        <p style="margin: 0;">Email ini dikirim secara otomatis oleh SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri.</p>
         <p style="margin: 5px 0 0 0;">© 2026 Sespimma Lemdiklat Polri. All rights reserved.</p>
       </div>
     </div>
   `;
 
-  const textContent = `Yth. ${user.name},\n\nMohon maaf, permohonan pendaftaran akun (${user.email}) pada Sistem Inventaris Logistik Sespimma Lemdiklat Polri TIDAK DISETUJUI oleh Administrator (${rejectedBy}).\n\nAlasan: ${rejectionReason || 'Data identitas tidak sesuai.'}\n\nSespimma Lemdiklat Polri.`;
+  const textContent = `Yth. ${user.name},\n\nMohon maaf, permohonan pendaftaran akun (${user.email}) pada SIAP-LOG (Sistem Inventaris Aset dan Peralatan Logistik) Sespimma Lemdiklat Polri TIDAK DISETUJUI oleh Administrator (${rejectedBy}).\n\nAlasan: ${rejectionReason || 'Data identitas tidak sesuai.'}\n\nSespimma Lemdiklat Polri.`;
 
   try {
     await addDoc(collection(db, 'mail'), {

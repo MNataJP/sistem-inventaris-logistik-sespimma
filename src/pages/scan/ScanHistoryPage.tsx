@@ -183,7 +183,7 @@ export const ScanHistoryPage: React.FC = () => {
                 type="text"
                 className="form-input"
                 style={{ paddingLeft: '2.25rem', fontSize: '0.85rem' }}
-                placeholder="Cari kode barang, nama pemindai, perangkat..."
+                placeholder="Masukkan kode barang, nama pemindai, atau tipe perangkat..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />

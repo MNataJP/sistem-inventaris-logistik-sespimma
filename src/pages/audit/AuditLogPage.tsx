@@ -181,7 +181,7 @@ export const AuditLogPage: React.FC = () => {
                 type="text"
                 className="form-input"
                 style={{ paddingLeft: '2.25rem', fontSize: '0.85rem' }}
-                placeholder="Cari modul, aksi, pelaku, deskripsi..."
+                placeholder="Masukkan modul, jenis aksi, nama pelaku, atau deskripsi..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />

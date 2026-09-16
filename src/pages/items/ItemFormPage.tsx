@@ -282,7 +282,7 @@ export const ItemFormPage: React.FC = () => {
                 type="text"
                 required
                 className="form-input"
-                placeholder="Contoh: Laptop Dell Latitude 5420"
+                placeholder="Masukkan nama barang..."
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -301,23 +301,23 @@ export const ItemFormPage: React.FC = () => {
 
               <div className="form-group">
                 <label className="form-label">Merk / Brand</label>
-                <input type="text" className="form-input" placeholder="Contoh: Dell, Samsung, Yamaha, dll" value={brand} onChange={e => setBrand(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Masukkan merk / brand barang..." value={brand} onChange={e => setBrand(e.target.value)} />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Tipe / Model</label>
-                <input type="text" className="form-input" placeholder="Contoh: Latitude 5420" value={model} onChange={e => setModel(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Masukkan tipe / model barang..." value={model} onChange={e => setModel(e.target.value)} />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Nomor Seri Pabrik (S/N)</label>
-                <input type="text" className="form-input" placeholder="Contoh: SN123456789" value={serialNumber} onChange={e => setSerialNumber(e.target.value)} />
+                <input type="text" className="form-input" placeholder="Masukkan nomor seri pabrik (S/N)..." value={serialNumber} onChange={e => setSerialNumber(e.target.value)} />
               </div>
             </div>
 
             <div className="form-group">
               <label className="form-label">Penanggung Jawab / Pengguna Aset</label>
-              <input type="text" className="form-input" placeholder="Contoh: Nama Petugas / Pamen / Bintara" value={responsiblePersonName} onChange={e => setResponsiblePersonName(e.target.value)} />
+              <input type="text" className="form-input" placeholder="Masukkan nama penanggung jawab / pengguna aset..." value={responsiblePersonName} onChange={e => setResponsiblePersonName(e.target.value)} />
             </div>
 
             <div className="form-group">
@@ -325,7 +325,7 @@ export const ItemFormPage: React.FC = () => {
               <textarea
                 className="form-textarea"
                 rows={4}
-                placeholder={`Contoh spesifikasi (tekan ENTER untuk membuat poin baru):\n• Intel Core i7-1165G7\n• RAM 16GB DDR4\n• SSD 512GB NVMe\n• Garansi Resmi 1 Tahun`}
+                placeholder="Masukkan deskripsi & spesifikasi detail barang...\nCatatan: Tekan ENTER untuk membuat poin baru."
                 value={description}
                 onChange={e => setDescription(e.target.value)}
               />
@@ -422,7 +422,7 @@ export const ItemFormPage: React.FC = () => {
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="Contoh: Gedung Tribrata / Gadik"
+                      placeholder="Masukkan nama gedung / bangunan..."
                       value={building}
                       onChange={e => setBuilding(e.target.value)}
                     />
@@ -461,7 +461,7 @@ export const ItemFormPage: React.FC = () => {
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="Contoh: Subbag Renmin / Kelas A"
+                      placeholder="Masukkan nama ruangan..."
                       value={room}
                       onChange={e => setRoom(e.target.value)}
                     />
@@ -484,7 +484,7 @@ export const ItemFormPage: React.FC = () => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Contoh: 1, 2, dll"
+                  placeholder="Masukkan lantai..."
                   value={floor}
                   onChange={e => setFloor(e.target.value)}
                 />
@@ -496,7 +496,7 @@ export const ItemFormPage: React.FC = () => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Contoh: Meja 02 / Rak A3"
+                  placeholder="Masukkan detail posisi lokasi..."
                   value={locationDetail}
                   onChange={e => setLocationDetail(e.target.value)}
                 />
@@ -537,7 +537,7 @@ export const ItemFormPage: React.FC = () => {
                     inputMode="numeric"
                     className="form-input"
                     style={{ paddingLeft: '2.5rem' }}
-                    placeholder="Contoh: 1.500.000 (Ketik angka saja)"
+                    placeholder="Masukkan harga perolehan barang (ketik angka saja)..."
                     value={purchasePrice}
                     onChange={handlePriceChange}
                   />
@@ -549,7 +549,7 @@ export const ItemFormPage: React.FC = () => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Contoh: APBN 2026 / PNBP / Hibah"
+                  placeholder="Masukkan sumber dana pengadaan..."
                   value={fundingSource}
                   onChange={e => setFundingSource(e.target.value)}
                 />
@@ -560,7 +560,7 @@ export const ItemFormPage: React.FC = () => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Contoh: PT. Logistik Utama"
+                  placeholder="Masukkan nama vendor / penyedia..."
                   value={vendor}
                   onChange={e => setVendor(e.target.value)}
                 />

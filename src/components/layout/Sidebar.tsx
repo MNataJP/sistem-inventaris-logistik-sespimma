@@ -52,8 +52,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <img src="/logo.png" alt="Logo Sespimma Polri" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <div className="sidebar-header-title" style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <h3 style={{ fontSize: '0.95rem', color: '#ffffff', margin: 0, fontWeight: 700 }}>LOGISTIK</h3>
-            <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>SESPIMMA POLRI</span>
+            <h3 style={{ fontSize: '0.95rem', color: '#ffffff', margin: 0, fontWeight: 800 }}>SIAP-LOG</h3>
+            <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>SESPIMMA LEMDIKLAT POLRI</span>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       <div style={{ padding: '1rem', borderTop: '1px solid #1e293b', fontSize: '0.75rem', color: '#64748b', textAlign: 'center' }} className="sidebar-text">
-        Sespimma Polri v1.0
+        SIAP-LOG Sespimma v1.0
       </div>
 
       <style>{`
